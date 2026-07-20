@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: -apple-system, "Malgun Gothic", sans-serif;
+      margin: 24px;
+      color: #222;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .search-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .input-wrap {
+      position: relative;
+      flex: 1;
+      max-width: 320px;
+    }
+    #ownerInput {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    #suggestList {
+      display: none;
+      position: absolute;
+      top: calc(100% + 2px);
+      left: 0;
+      right: 0;
+      max-height: 260px;
+      overflow-y: auto;
+      margin: 0;
+      padding: 4px 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      z-index: 10;
+    }
+    #suggestList li {
+      padding: 7px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #suggestList li:hover,
+    #suggestList li.active {
+      background: #f0f4fe;
+    }
+    #suggestList li mark {
+      background: #ffe08a;
+      color: inherit;
+      font-weight: bold;
+    }
+    #suggestList .empty {
+      color: #999;
+      cursor: default;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      background: #1a73e8;
+      color: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1558b0;
+    }
+    #status {
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #555;
+    }
+    #resultWrap {
+      overflow-x: auto;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    th, td {
+      border-bottom: 1px solid #eee;
+      padding: 6px 10px;
+      text-align: left;
+    }
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f5f5f5;
+      z-index: 1;
+    }
+    tbody tr:hover {
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <h1>법인카드 사용내역 조회</h1>
+  <div class="search-bar">
+    <div class="input-wrap">
+      <input id="ownerInput" placeholder="사원명(소유자)을 입력하세요" autocomplete="off">
+      <ul id="suggestList"></ul>
+    </div>
+    <button id="searchBtn">조회</button>
+  </div>
+  <div id="status"></div>
+  <div id="resultWrap">
+    <table id="resultTable">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    var allOwners = [];
+    var searchTimer = null;
+
+    function loadOwners() {
+      google.script.run.withSuccessHandler(function (names) {
+        allOwners = names;
+        var status = document.getElementById('status');
+        status.textContent = '사원명을 입력하거나 목록에서 선택하세요. (총 ' + names.length + '명)';
+        showSuggestions('');
+      }).getOwnerList();
+    }
+
+    function highlight(name, query) {
+      if (!query) return name;
+      var idx = name.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return name;
+      return name.slice(0, idx) + '<mark>' + name.slice(idx, idx + query.length) + '</mark>' + name.slice(idx + query.length);
+    }
+
+    function showSuggestions(query) {
+      var list = document.getElementById('suggestList');
+      var q = query.trim();
+      var matches = q
+        ? allOwners.filter(function (n) { return n.toLowerCase().indexOf(q.toLowerCase()) !== -1; })
+        : allOwners;
+
+      list.innerHTML = '';
+      if (!matches.length) {
+        var empty = document.createElement('li');
+        empty.className = 'empty';
+        empty.textContent = '일치하는 사원이 없습니다.';
+        list.appendChild(empty);
+      } else {
+        matches.forEach(function (name) {
+          var li = document.createElement('li');
+          li.innerHTML = highlight(name, q);
+          li.addEventListener('mousedown', function (e) {
+            // mousedown(선 blur 방지)으로 클릭 즉시 선택 처리
+            e.preventDefault();
+            selectOwner(name);
+          });
+          list.appendChild(li);
+        });
+      }
+      list.style.display = 'block';
+    }
+
+    function hideSuggestions() {
+      document.getElementById('suggestList').style.display = 'none';
+    }
+
+    function selectOwner(name) {
+      document.getElementById('ownerInput').value = name;
+      hideSuggestions();
+      doSearch();
+    }
+
+    function renderResult(result) {
+      var thead = document.querySelector('#resultTable thead');
+      var tbody = document.querySelector('#resultTable tbody');
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+      var status = document.getElementById('status');
+
+      if (!result.rows.length) {
+        status.textContent = '조회된 거래내역이 없습니다.';
+        return;
+      }
+      status.textContent = result.rows.length + '건 조회됨';
+
+      var trHead = document.createElement('tr');
+      result.headers.forEach(function (h) {
+        var th = document.createElement('th');
+        th.textContent = h;
+        trHead.appendChild(th);
+      });
+      thead.appendChild(trHead);
+
+      result.rows.forEach(function (row) {
+        var tr = document.createElement('tr');
+        row.forEach(function (cell) {
+          var td = document.createElement('td');
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function doSearch() {
+      var q = document.getElementById('ownerInput').value.trim();
+      var status = document.getElementById('status');
+      if (!q) {
+        status.textContent = '사원명을 입력하세요.';
+        return;
+      }
+      status.textContent = '조회 중...';
+      google.script.run
+        .withSuccessHandler(renderResult)
+        .withFailureHandler(function (err) {
+          status.textContent = '오류: ' + err.message;
+        })
+        .searchByOwner(q);
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', function () {
+      hideSuggestions();
+      doSearch();
+    });
+
+    var input = document.getElementById('ownerInput');
+
+    input.addEventListener('focus', function () {
+      showSuggestions(input.value);
+    });
+
+    input.addEventListener('input', function () {
+      showSuggestions(input.value);
+
+      // 네이버 연관검색어처럼 입력할 때마다 살짝 지연 후 자동 조회
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(function () {
+        if (input.value.trim()) doSearch();
+      }, 300);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        clearTimeout(searchTimer);
+        hideSuggestions();
+        doSearch();
+      } else if (e.key === 'Escape') {
+        hideSuggestions();
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.input-wrap')) hideSuggestions();
+    });
+
+    loadOwners();
+  </script>
+</body>
+</html>
