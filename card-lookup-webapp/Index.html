@@ -4,139 +4,381 @@
   <base target="_top">
   <meta charset="utf-8">
   <style>
-    body {
-      font-family: -apple-system, "Malgun Gothic", sans-serif;
-      margin: 24px;
-      color: #222;
+    :root {
+      --accent: #4361ee;
+      --accent-dark: #3249c7;
+      --bg: #f2f4f8;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #1f2430;
+      --muted: #6b7280;
+      --highlight: #fff1a8;
     }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 16px;
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 40px 20px 80px;
+    }
+    .page {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .header svg {
+      width: 30px;
+      height: 30px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-size: 21px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .header p {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(20, 20, 43, 0.06), 0 8px 24px rgba(20, 20, 43, 0.05);
+      margin-bottom: 20px;
     }
     .search-bar {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 10px;
     }
     .input-wrap {
       position: relative;
       flex: 1;
-      max-width: 320px;
+    }
+    .input-wrap svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 17px;
+      height: 17px;
+      color: var(--muted);
+      pointer-events: none;
     }
     #ownerInput {
       width: 100%;
-      box-sizing: border-box;
-      padding: 8px 10px;
-      font-size: 14px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px 14px 12px 40px;
+      font-size: 14.5px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #fafbfc;
     }
+    #ownerInput:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.12);
+      background: #fff;
+    }
+    button {
+      padding: 0 22px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover {
+      background: var(--accent-dark);
+    }
+    button.secondary {
+      background: #fff;
+      color: var(--accent);
+      border: 1.5px solid var(--accent);
+      padding: 7px 16px;
+      font-size: 13px;
+    }
+    button.secondary:hover {
+      background: #eef1ff;
+      color: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    /* 자동완성 드롭다운: 입력 중일 때만 뜨는 목록 */
     #suggestList {
       display: none;
       position: absolute;
-      top: calc(100% + 2px);
+      top: calc(100% + 6px);
       left: 0;
       right: 0;
       max-height: 260px;
       overflow-y: auto;
       margin: 0;
-      padding: 4px 0;
+      padding: 6px;
       list-style: none;
       background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-      z-index: 10;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(20, 20, 43, 0.14);
+      z-index: 20;
+      animation: drop 0.12s ease-out;
+    }
+    @keyframes drop {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     #suggestList li {
-      padding: 7px 10px;
-      font-size: 13px;
+      padding: 9px 12px;
+      font-size: 13.5px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    #suggestList li:hover,
-    #suggestList li.active {
-      background: #f0f4fe;
+    #suggestList li:hover {
+      background: #eef1ff;
     }
     #suggestList li mark {
-      background: #ffe08a;
+      background: var(--highlight);
       color: inherit;
-      font-weight: bold;
+      font-weight: 700;
+      border-radius: 3px;
     }
     #suggestList .empty {
-      color: #999;
+      color: var(--muted);
       cursor: default;
     }
-    button {
-      padding: 8px 16px;
-      font-size: 14px;
-      border: none;
-      border-radius: 4px;
-      background: #1a73e8;
-      color: #fff;
-      cursor: pointer;
+    #suggestList .empty:hover {
+      background: none;
     }
-    button:hover {
-      background: #1558b0;
+
+    /* KPI 요약 */
+    #summary {
+      display: none;
+    }
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .kpi-tile {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .kpi-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .kpi-value {
+      display: block;
+      font-size: 19px;
+      font-weight: 700;
+    }
+    .kpi-value.amount {
+      color: var(--accent-dark);
+    }
+    .kpi-value.warn {
+      color: #c2703d;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
     }
     #status {
-      margin-bottom: 12px;
-      font-size: 13px;
-      color: #555;
+      display: inline-block;
+      padding: 6px 14px;
+      font-size: 12.5px;
+      color: var(--muted);
+      background: #eef1ff;
+      border-radius: 999px;
     }
+
+    /* ---- 결과 표 (가로 스크롤 없이 고정 컬럼만) ---- */
     #resultWrap {
       overflow-x: auto;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      overflow-y: auto;
+      max-height: 70vh;
+      border: 1px solid var(--border);
+      border-radius: 14px;
     }
     table {
       border-collapse: collapse;
       width: 100%;
       font-size: 13px;
-      white-space: nowrap;
     }
     th, td {
-      border-bottom: 1px solid #eee;
-      padding: 6px 10px;
+      padding: 11px 12px;
       text-align: left;
+      white-space: nowrap;
     }
     thead th {
       position: sticky;
       top: 0;
-      background: #f5f5f5;
-      z-index: 1;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+      z-index: 2;
     }
-    tbody tr:hover {
-      background: #fafafa;
+    tbody tr {
+      border-bottom: 1px solid var(--border);
     }
+    tbody tr:nth-child(even) { background: #f8f9fc; }
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody tr.over-limit { background: #fdf1f1; }
+
+    .col-no   { min-width: 40px; text-align: center; color: var(--muted); }
+    .col-name { min-width: 84px; font-weight: 600; }
+    .col-dept { min-width: 100px; color: var(--muted); }
+    .col-card { min-width: 78px; text-align: center; }
+    .col-date { min-width: 96px; text-align: center; }
+    .col-cardname { min-width: 84px; }
+    .col-merchant { min-width: 170px; white-space: normal; }
+    .col-amount { min-width: 100px; text-align: right; }
+    .col-status { min-width: 88px; text-align: center; }
+    .col-match  { min-width: 64px; text-align: center; }
+
+    td .amount { font-weight: 700; }
+    tr.over-limit td .amount { color: #b1543a; }
+
+    /* 파스텔 뱃지 팔레트 */
+    .badge {
+      display: inline-block;
+      padding: 3px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .badge-pastel-green  { background: #e3f6ea; color: #2f855a; }
+    .badge-pastel-amber  { background: #fef3d7; color: #9a6b12; }
+    .badge-pastel-indigo { background: #e9e7fb; color: #5b52b8; }
+    .badge-pastel-gray   { background: #f1f1f4; color: #6b7280; }
+    .badge-pastel-red    { background: #fde8e8; color: #b1414a; }
+    .badge-match-ok   { background: #e3f6ea; color: #2f855a; }
+    .badge-match-warn { background: #fef3d7; color: #9a6b12; }
   </style>
 </head>
 <body>
-  <h1>법인카드 사용내역 조회</h1>
-  <div class="search-bar">
-    <div class="input-wrap">
-      <input id="ownerInput" placeholder="사원명(소유자)을 입력하세요" autocomplete="off">
-      <ul id="suggestList"></ul>
+  <div class="page">
+    <div class="header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2.5"></rect>
+        <line x1="2" y1="10" x2="22" y2="10"></line>
+      </svg>
+      <div>
+        <h1>법인카드 사용내역 조회</h1>
+        <p>사원명을 입력하면 해당 사원의 법인카드 거래내역이 나옵니다</p>
+      </div>
     </div>
-    <button id="searchBtn">조회</button>
-  </div>
-  <div id="status"></div>
-  <div id="resultWrap">
-    <table id="resultTable">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
+
+    <div class="card">
+      <div class="search-bar">
+        <div class="input-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="ownerInput" placeholder="사원명(소유자)을 입력하세요 · 비워두고 조회하면 최근 내역이 나옵니다" autocomplete="off">
+          <ul id="suggestList"></ul>
+        </div>
+        <button id="searchBtn">조회</button>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <span id="status">사원명을 입력해 조회를 시작하세요</span>
+      <button id="downloadBtn" class="secondary" style="display:none;">엑셀로 다운로드</button>
+    </div>
+
+    <div id="summary">
+      <div class="kpi-row">
+        <div class="kpi-tile">
+          <span class="kpi-label">총 조회 건수</span>
+          <span class="kpi-value" id="kpiCount">-</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-label">총 사용 금액</span>
+          <span class="kpi-value amount" id="kpiAmount">-</span>
+        </div>
+        <div class="kpi-tile">
+          <span class="kpi-label">미처리 건수</span>
+          <span class="kpi-value" id="kpiPending">-</span>
+        </div>
+      </div>
+
+      <div id="resultWrap">
+        <table id="resultTable">
+          <thead>
+            <tr>
+              <th class="col-no">No.</th>
+              <th class="col-name">이름</th>
+              <th class="col-dept">부서</th>
+              <th class="col-card">카드번호</th>
+              <th class="col-date">승인일</th>
+              <th class="col-cardname">카드명</th>
+              <th class="col-merchant">가맹점</th>
+              <th class="col-amount">승인액</th>
+              <th class="col-status">전표상태</th>
+              <th class="col-match">일치</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <script>
     var allOwners = [];
-    var searchTimer = null;
+    var lastResult = null;
+    var lastQuery = '';
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function formatWon(num) {
+      return Number(num || 0).toLocaleString('ko-KR') + '원';
+    }
+
+    function statusBadgeClass(status) {
+      var s = String(status || '');
+      if (/반려|거부|취소|오류/.test(s)) return 'badge-pastel-red';
+      if (/종결/.test(s)) return 'badge-pastel-indigo';
+      if (/완료|승인/.test(s)) return 'badge-pastel-green';
+      if (/미처리/.test(s)) return 'badge-pastel-gray';
+      if (/처리|진행|대기/.test(s)) return 'badge-pastel-amber';
+      return 'badge-pastel-gray';
+    }
+
+    // ---- 자동완성 (입력할 때만 드롭다운으로 표시) ----
 
     function loadOwners() {
       google.script.run.withSuccessHandler(function (names) {
         allOwners = names;
-        var status = document.getElementById('status');
-        status.textContent = '사원명을 입력하거나 목록에서 선택하세요. (총 ' + names.length + '명)';
-        showSuggestions('');
       }).getOwnerList();
     }
 
@@ -150,22 +392,27 @@
     function showSuggestions(query) {
       var list = document.getElementById('suggestList');
       var q = query.trim();
-      var matches = q
-        ? allOwners.filter(function (n) { return n.toLowerCase().indexOf(q.toLowerCase()) !== -1; })
-        : allOwners;
+
+      if (!q) {
+        hideSuggestions();
+        return;
+      }
+
+      var matches = allOwners.filter(function (n) {
+        return n.toLowerCase().indexOf(q.toLowerCase()) !== -1;
+      });
 
       list.innerHTML = '';
       if (!matches.length) {
         var empty = document.createElement('li');
         empty.className = 'empty';
-        empty.textContent = '일치하는 사원이 없습니다.';
+        empty.textContent = '일치하는 사원이 없습니다';
         list.appendChild(empty);
       } else {
         matches.forEach(function (name) {
           var li = document.createElement('li');
           li.innerHTML = highlight(name, q);
           li.addEventListener('mousedown', function (e) {
-            // mousedown(선 blur 방지)으로 클릭 즉시 선택 처리
             e.preventDefault();
             selectOwner(name);
           });
@@ -185,78 +432,14 @@
       doSearch();
     }
 
-    function renderResult(result) {
-      var thead = document.querySelector('#resultTable thead');
-      var tbody = document.querySelector('#resultTable tbody');
-      thead.innerHTML = '';
-      tbody.innerHTML = '';
-      var status = document.getElementById('status');
+    var ownerInput = document.getElementById('ownerInput');
 
-      if (!result.rows.length) {
-        status.textContent = '조회된 거래내역이 없습니다.';
-        return;
-      }
-      status.textContent = result.rows.length + '건 조회됨';
-
-      var trHead = document.createElement('tr');
-      result.headers.forEach(function (h) {
-        var th = document.createElement('th');
-        th.textContent = h;
-        trHead.appendChild(th);
-      });
-      thead.appendChild(trHead);
-
-      result.rows.forEach(function (row) {
-        var tr = document.createElement('tr');
-        row.forEach(function (cell) {
-          var td = document.createElement('td');
-          td.textContent = cell;
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-    }
-
-    function doSearch() {
-      var q = document.getElementById('ownerInput').value.trim();
-      var status = document.getElementById('status');
-      if (!q) {
-        status.textContent = '사원명을 입력하세요.';
-        return;
-      }
-      status.textContent = '조회 중...';
-      google.script.run
-        .withSuccessHandler(renderResult)
-        .withFailureHandler(function (err) {
-          status.textContent = '오류: ' + err.message;
-        })
-        .searchByOwner(q);
-    }
-
-    document.getElementById('searchBtn').addEventListener('click', function () {
-      hideSuggestions();
-      doSearch();
+    ownerInput.addEventListener('input', function () {
+      showSuggestions(ownerInput.value);
     });
 
-    var input = document.getElementById('ownerInput');
-
-    input.addEventListener('focus', function () {
-      showSuggestions(input.value);
-    });
-
-    input.addEventListener('input', function () {
-      showSuggestions(input.value);
-
-      // 네이버 연관검색어처럼 입력할 때마다 살짝 지연 후 자동 조회
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(function () {
-        if (input.value.trim()) doSearch();
-      }, 300);
-    });
-
-    input.addEventListener('keydown', function (e) {
+    ownerInput.addEventListener('keydown', function (e) {
       if (e.key === 'Enter') {
-        clearTimeout(searchTimer);
         hideSuggestions();
         doSearch();
       } else if (e.key === 'Escape') {
@@ -267,6 +450,133 @@
     document.addEventListener('click', function (e) {
       if (!e.target.closest('.input-wrap')) hideSuggestions();
     });
+
+    document.getElementById('searchBtn').addEventListener('click', function () {
+      hideSuggestions();
+      doSearch();
+    });
+
+    // ---- 조회 & 결과 렌더링 ----
+
+    function doSearch() {
+      var q = document.getElementById('ownerInput').value.trim();
+      var status = document.getElementById('status');
+      var downloadBtn = document.getElementById('downloadBtn');
+
+      lastQuery = q;
+      lastResult = null;
+      downloadBtn.style.display = 'none';
+      document.getElementById('summary').style.display = 'block';
+      status.textContent = '조회 중...';
+
+      google.script.run
+        .withSuccessHandler(renderResult)
+        .withFailureHandler(function (err) {
+          status.textContent = '오류: ' + err.message;
+        })
+        .searchByOwner(q);
+    }
+
+    function renderSummary(rows) {
+      var totalAmount = 0;
+      var pendingCount = 0;
+      rows.forEach(function (r) {
+        totalAmount += r.amount;
+        if (/미처리/.test(r.status || '')) pendingCount++;
+      });
+
+      document.getElementById('kpiCount').textContent = rows.length + '건';
+      document.getElementById('kpiAmount').textContent = totalAmount.toLocaleString('ko-KR') + '원';
+      var kpiPending = document.getElementById('kpiPending');
+      kpiPending.textContent = pendingCount + '건';
+      kpiPending.classList.toggle('warn', pendingCount > 0);
+    }
+
+    function renderRow(r, no) {
+      var tr = document.createElement('tr');
+      if (r.overLimit) tr.className = 'over-limit';
+
+      tr.innerHTML =
+        '<td class="col-no">' + no + '</td>' +
+        '<td class="col-name">' + escapeHtml(r.name || '-') + '</td>' +
+        '<td class="col-dept">' + escapeHtml(r.dept || '-') + '</td>' +
+        '<td class="col-card">' + (r.cardLast4 ? '#' + escapeHtml(r.cardLast4) : '-') + '</td>' +
+        '<td class="col-date">' + escapeHtml(r.date || '-') + '</td>' +
+        '<td class="col-cardname">' + escapeHtml(r.cardName || '-') + '</td>' +
+        '<td class="col-merchant">' + escapeHtml(r.merchant || '-') + '</td>' +
+        '<td class="col-amount"><span class="amount">' + formatWon(r.amount) + '</span></td>' +
+        '<td class="col-status">' + (r.status ? '<span class="badge ' + statusBadgeClass(r.status) + '">' + escapeHtml(r.status) + '</span>' : '-') + '</td>' +
+        '<td class="col-match">' + (r.match
+          ? '<span class="badge badge-match-ok">일치</span>'
+          : '<span class="badge badge-match-warn">확인</span>') + '</td>';
+      return tr;
+    }
+
+    function renderResult(result) {
+      var status = document.getElementById('status');
+      var downloadBtn = document.getElementById('downloadBtn');
+
+      lastResult = result;
+
+      if (!result.rows.length) {
+        status.textContent = '조회된 거래내역이 없습니다';
+        downloadBtn.style.display = 'none';
+        document.getElementById('kpiCount').textContent = '0건';
+        document.getElementById('kpiAmount').textContent = '0원';
+        document.getElementById('kpiPending').textContent = '0건';
+        document.querySelector('#resultTable tbody').innerHTML = '';
+        return;
+      }
+
+      renderSummary(result.rows);
+      status.textContent = result.truncated
+        ? ('전체 ' + result.totalCount + '건 중 최근 ' + result.rows.length + '건만 표시 중 · 사원명으로 좁혀서 조회하면 전체 내역을 볼 수 있어요')
+        : (result.rows.length + '건 조회됨');
+      downloadBtn.style.display = 'inline-block';
+
+      var tbody = document.querySelector('#resultTable tbody');
+      tbody.innerHTML = '';
+      result.rows.forEach(function (r, i) {
+        tbody.appendChild(renderRow(r, i + 1));
+      });
+    }
+
+    // ---- 다운로드 ----
+
+    function csvEscape(value) {
+      var s = String(value == null ? '' : value);
+      if (/[",\n]/.test(s)) {
+        s = '"' + s.replace(/"/g, '""') + '"';
+      }
+      return s;
+    }
+
+    function downloadCsv() {
+      if (!lastResult || !lastResult.rows.length) return;
+
+      var headerRow = ['번호', '이름', '부서', '카드번호', '승인일', '카드명', '가맹점', '승인액', '전표상태', '사용자소유자일치'];
+      var lines = [headerRow.map(csvEscape).join(',')];
+      lastResult.rows.forEach(function (r, i) {
+        var line = [
+          i + 1, r.name, r.dept, r.cardLast4 ? '#' + r.cardLast4 : '', r.date,
+          r.cardName, r.merchant, r.amount, r.status, r.match ? '일치' : '확인필요'
+        ];
+        lines.push(line.map(csvEscape).join(','));
+      });
+      var csv = '﻿' + lines.join('\r\n');
+
+      var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = '법인카드_사용내역_' + (lastQuery || '전체') + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', downloadCsv);
 
     loadOwners();
   </script>
