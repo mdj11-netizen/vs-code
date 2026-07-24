@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>나의 여행 기록</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@900&family=Noto+Serif+KR:wght@700&display=swap" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #1f2937;
+    --sub: #6b7785;
+    --accent: #2f9e83;
+    --accent-dark: #23795f;
+    --accent-soft: #e9f7f2;
+    --accent-blue: #2f6fed;
+    --card-bg: #ffffff;
+    --border: #e3e8ec;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  button { font-family: inherit; }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 60px 24px;
+    background: linear-gradient(135deg, #ffffff 0%, #eef6ff 45%, #cfe6ff 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .hero-text { flex: 1 1 260px; min-width: 240px; }
+  .hero-text .line1 {
+    font-family: "Gothic A1", "Pretendard", sans-serif;
+    font-weight: 900;
+    font-size: 3.1rem;
+    line-height: 1.08;
+    letter-spacing: -1px;
+    color: #15161a;
+  }
+  .hero-text .line2 {
+    font-family: "Noto Serif KR", serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 2.9rem;
+    line-height: 1.35;
+    padding: 0 10px;
+    background-image: linear-gradient(180deg, transparent 60%, #ffe14d 60%);
+    display: inline-block;
+  }
+  .hero-text .hero-sub {
+    margin-top: 16px;
+    color: var(--sub);
+    font-size: 1.02rem;
+  }
+
+  .hero-spotlight {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .spotlight-arrow {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #ff7aa8, #ff3d77);
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 18px rgba(255, 61, 119, 0.35);
+  }
+  .spotlight-arrow:hover { filter: brightness(1.06); }
+
+  .spotlight-photo-wrap { position: relative; width: 210px; height: 290px; }
+  .spotlight-blob {
+    position: absolute;
+    left: 50%;
+    bottom: -18px;
+    transform: translateX(-50%);
+    width: 170px;
+    height: 60px;
+    background: radial-gradient(ellipse at center, rgba(255, 122, 168, 0.55) 0%, transparent 72%);
+  }
+  .spotlight-photo {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 22px 36px rgba(20, 30, 60, 0.22);
+    cursor: pointer;
+  }
+  .spotlight-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .spotlight-caption {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  .spotlight-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 56px);
+    gap: 10px;
+  }
+  .spotlight-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #ffb8cf;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 61, 119, 0.18);
+    transition: transform 0.15s, border-color 0.15s;
+  }
+  .spotlight-thumb.active { border-color: #ff3d77; transform: scale(1.08); }
+  .spotlight-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  @media (max-width: 900px) {
+    .hero-inner { justify-content: center; text-align: center; }
+    .hero-spotlight { display: none; }
+  }
+
+  nav.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 24px 16px 8px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  nav.filter-bar button {
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--ink);
+    padding: 8px 18px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  nav.filter-bar button.active,
+  nav.filter-bar button:hover {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .toolbar {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 12px 24px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .view-toggle {
+    display: flex;
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .view-toggle button {
+    border: none;
+    background: transparent;
+    color: var(--sub);
+    width: 34px;
+    height: 30px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .view-toggle button.active {
+    background: var(--card-bg);
+    color: var(--accent-blue);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .info-btn {
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--sub);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .info-btn:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+  .add-btn {
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    padding: 0 16px;
+    height: 32px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .add-btn:hover { background: var(--accent-dark); }
+
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 8px 24px 80px;
+  }
+
+  .trip-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 26px;
+    margin-top: 16px;
+  }
+  .trip-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .trip-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s;
+  }
+  .trip-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(47, 158, 131, 0.14);
+    border-color: var(--accent);
+  }
+  .trip-card .thumb {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8rem;
+    background: linear-gradient(135deg, #eef4f6, #dfeae8);
+    overflow: hidden;
+  }
+  .trip-card .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .trip-card .body {
+    padding: 16px 18px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .trip-card .date {
+    font-size: 0.78rem;
+    color: var(--sub);
+    margin-bottom: 6px;
+  }
+  .trip-card h2 {
+    font-size: 1.15rem;
+    margin: 0 0 8px;
+  }
+  .trip-card p.teaser {
+    color: var(--sub);
+    font-size: 0.88rem;
+    margin: 0 0 14px;
+    flex: 1;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .tags span {
+    font-size: 0.72rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 999px;
+  }
+
+  /* 리스트 뷰 */
+  .trip-grid.list-view .trip-card {
+    flex-direction: row;
+    align-items: center;
+  }
+  .trip-grid.list-view .trip-card .thumb {
+    width: 84px;
+    height: 84px;
+    flex: none;
+    font-size: 2rem;
+  }
+  .trip-grid.list-view .trip-card .body {
+    padding: 10px 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+  .trip-grid.list-view .trip-card h2 { margin: 0; min-width: 90px; }
+  .trip-grid.list-view .trip-card .date { margin: 0; min-width: 80px; }
+  .trip-grid.list-view .trip-card p.teaser { display: none; }
+  .trip-grid.list-view .trip-card .tags { margin-left: auto; }
+
+  footer {
+    text-align: center;
+    padding: 40px 16px;
+    color: var(--sub);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* 공통 오버레이 */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(16, 24, 32, 0.5);
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    overflow-y: auto;
+    z-index: 200;
+  }
+  .overlay.open { display: flex; }
+  .box {
+    background: var(--card-bg);
+    border-radius: 16px;
+    max-width: 560px;
+    width: 100%;
+    padding: 32px 32px 28px;
+    position: relative;
+  }
+  .box .close-btn {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    color: var(--sub);
+    cursor: pointer;
+  }
+  .box .modal-thumb { font-size: 2.4rem; margin-bottom: 6px; }
+  .box h2 { margin: 0 0 4px; font-size: 1.5rem; }
+  .box .modal-region { color: var(--accent); font-size: 0.85rem; margin-bottom: 20px; }
+
+  .field-group { margin-bottom: 18px; }
+  .field-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--sub);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .field-group input,
+  .field-group select,
+  .field-group textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: var(--ink);
+    background: #fafcfd;
+  }
+  .field-group textarea { resize: vertical; min-height: 70px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .save-btn {
+    width: 100%;
+    border: none;
+    background: var(--accent-blue);
+    color: #fff;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .save-btn:hover { background: #2f65c4; }
+
+  /* 상세 페이지 */
+  .detail-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 300;
+    overflow-y: auto;
+  }
+  .detail-page.open { display: block; }
+  .detail-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card-bg);
+    position: sticky;
+    top: 0;
+  }
+  .back-btn {
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .detail-thumb {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, #eef4f6, #dfeae8);
+    overflow: hidden;
+  }
+  .detail-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .detail-title-wrap h2 { margin: 0; font-size: 1.3rem; }
+  .detail-title-wrap span { font-size: 0.8rem; color: var(--accent); }
+
+  .detail-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 16px 24px 0;
+    max-width: 900px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .detail-tabs button {
+    border: none;
+    background: none;
+    padding: 10px 16px;
+    font-size: 0.92rem;
+    color: var(--sub);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+  }
+  .detail-tabs button.active {
+    color: var(--ink);
+    border-bottom-color: var(--accent-blue);
+    font-weight: 600;
+  }
+
+  .detail-body {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .overview-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .overview-item .label { font-size: 0.75rem; color: var(--sub); margin-bottom: 4px; }
+  .overview-item .value { font-size: 1rem; }
+  .overview-note {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    white-space: pre-wrap;
+  }
+  .overview-note .label { font-size: 0.75rem; color: var(--sub); margin-bottom: 6px; }
+  .edit-btn {
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .edit-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+  .media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .media-tile {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #eef4f6;
+  }
+  .media-tile img, .media-tile video { width: 100%; height: 100%; object-fit: cover; }
+  .media-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9fb0b8;
+    font-size: 1.8rem;
+    cursor: pointer;
+    border: 1px dashed var(--border);
+  }
+  .media-note { font-size: 0.78rem; color: var(--sub); margin-top: 12px; }
+
+  .ledger-form {
+    display: grid;
+    grid-template-columns: 130px 110px 120px 1fr auto;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: end;
+  }
+  .ledger-form .field-group { margin-bottom: 0; }
+  .ledger-form button {
+    border: none;
+    background: var(--accent-blue);
+    color: #fff;
+    border-radius: 8px;
+    padding: 9px 16px;
+    cursor: pointer;
+    height: 38px;
+  }
+  table.ledger-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  table.ledger-table th, table.ledger-table td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.ledger-table th { color: var(--sub); font-weight: 600; font-size: 0.8rem; }
+  table.ledger-table td.amount { text-align: right; font-variant-numeric: tabular-nums; }
+  table.ledger-table tfoot td { font-weight: 700; border-bottom: none; }
+  .del-btn { border: none; background: none; color: #c0603f; cursor: pointer; font-size: 0.85rem; }
+  .empty-state { color: var(--sub); font-size: 0.9rem; padding: 20px 0; }
+
+  .timeline-day { margin-bottom: 22px; }
+  .timeline-day .day-head {
+    font-weight: 700;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+  }
+  .timeline-day .day-head span.sub { font-weight: 400; color: var(--sub); font-size: 0.85rem; }
+  .timeline-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.9rem;
+  }
+  .timeline-entry .memo { color: var(--sub); }
+
+  .info-guide { font-size: 0.92rem; }
+  .info-guide li { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="line1">나의 여행</div>
+      <div class="line2">기록</div>
+      <p class="hero-sub">다녀온 곳들을 하나씩 기록해두는 공간.</p>
+    </div>
+
+    <div class="hero-spotlight">
+      <button class="spotlight-arrow" id="spotlightPrev">◀</button>
+      <div class="spotlight-photo-wrap">
+        <div class="spotlight-blob"></div>
+        <div class="spotlight-photo" id="spotlightPhoto">
+          <img id="spotlightImg" src="" alt="">
+          <div class="spotlight-caption" id="spotlightCaption"></div>
+        </div>
+      </div>
+      <button class="spotlight-arrow" id="spotlightNext">▶</button>
+      <div class="spotlight-grid" id="spotlightGrid"></div>
+    </div>
+  </div>
+</header>
+
+<nav class="filter-bar" id="filterBar">
+  <button class="active" data-filter="all">전체</button>
+  <button data-filter="국내">국내</button>
+  <button data-filter="아시아">아시아</button>
+  <button data-filter="유럽">유럽</button>
+  <button data-filter="남미">남미</button>
+  <button data-filter="아프리카">아프리카</button>
+</nav>
+
+<div class="toolbar">
+  <div class="view-toggle" id="viewToggle">
+    <button class="active" data-view="grid" title="큰 아이콘 보기">▦</button>
+    <button data-view="list" title="리스트 보기">☰</button>
+  </div>
+  <button class="info-btn" id="infoBtn" title="사용법">ⓘ</button>
+  <button class="add-btn" id="addTripBtn">＋ 여행 추가</button>
+</div>
+
+<main>
+  <div class="trip-grid" id="tripGrid"></div>
+</main>
+
+<footer>
+  © 2026 나의 여행 기록 · 초안 버전
+</footer>
+
+<!-- 기본 정보 입력 모달 -->
+<div class="overlay" id="modalOverlay">
+  <div class="box">
+    <button class="close-btn" id="modalClose">×</button>
+    <div class="modal-thumb" id="modalThumb"></div>
+
+    <div id="modalNameFields" style="display:none;">
+      <div class="field-row">
+        <div class="field-group">
+          <label>지역</label>
+          <select id="newRegion">
+            <option value="국내">국내</option>
+            <option value="아시아">아시아</option>
+            <option value="유럽">유럽</option>
+            <option value="남미">남미</option>
+            <option value="아프리카">아프리카</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>여행지 이름</label>
+          <input type="text" id="newName" placeholder="예: 스위스">
+        </div>
+      </div>
+    </div>
+
+    <h2 id="modalTitle"></h2>
+    <div class="modal-region" id="modalRegion"></div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>여행 날짜</label>
+        <input type="text" id="fieldDate" placeholder="예: 2026.03">
+      </div>
+      <div class="field-group">
+        <label>여행 기간</label>
+        <input type="text" id="fieldDuration" placeholder="예: 4박 5일">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label>동행</label>
+        <input type="text" id="fieldCompanions" placeholder="예: 혼자 / 친구 2명">
+      </div>
+      <div class="field-group">
+        <label>예산</label>
+        <input type="text" id="fieldBudget" placeholder="예: 150만원">
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label>하이라이트</label>
+      <textarea id="fieldHighlight" placeholder="이번 여행에서 가장 기억에 남는 장면을 적어보세요."></textarea>
+    </div>
+
+    <div class="field-group">
+      <label>메모 / 후기</label>
+      <textarea id="fieldMemo" placeholder="자유롭게 여행 후기를 남겨보세요."></textarea>
+    </div>
+
+    <button class="save-btn" id="modalSave">저장하고 상세 페이지 보기</button>
+  </div>
+</div>
+
+<!-- 사용법 안내 모달 -->
+<div class="overlay" id="infoOverlay">
+  <div class="box">
+    <button class="close-btn" id="infoClose">×</button>
+    <h2>사용법</h2>
+    <ul class="info-guide">
+      <li>카드를 처음 클릭하면 날짜·기간·예산 같은 기본 정보를 입력하는 창이 떠요.</li>
+      <li>기본 정보를 저장하면 그 여행지의 상세 페이지로 이동해요. 상세 페이지에는 개요, 사진/영상, 가계부, 날짜별 보기 탭이 있어요.</li>
+      <li>이미 기록이 있는 카드를 클릭하면 바로 상세 페이지가 열려요.</li>
+      <li>우측 상단 ＋ 버튼으로 목록에 없는 새로운 여행지를 추가할 수 있어요.</li>
+      <li>▦ / ☰ 버튼으로 큰 아이콘 보기 / 리스트 보기를 전환할 수 있어요.</li>
+      <li>사진·영상, 가계부 기록은 이 브라우저에 저장돼요(로컬 저장). 단, 사진/영상 파일 자체는 새로고침하면 다시 불러와지지 않는 임시 미리보기예요.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 상세 페이지 -->
+<div class="detail-page" id="detailPage">
+  <div class="detail-top">
+    <button class="back-btn" id="detailBack">←</button>
+    <div class="detail-thumb" id="detailThumb"></div>
+    <div class="detail-title-wrap">
+      <h2 id="detailName"></h2>
+      <span id="detailRegion"></span>
+    </div>
+  </div>
+
+  <div class="detail-tabs">
+    <button class="active" data-tab="overview">개요</button>
+    <button data-tab="media">사진·영상</button>
+    <button data-tab="ledger">가계부</button>
+    <button data-tab="timeline">날짜별 보기</button>
+  </div>
+
+  <div class="detail-body">
+    <div class="tab-panel active" id="panel-overview">
+      <div class="overview-grid" id="overviewGrid"></div>
+      <div class="overview-note">
+        <div class="label">하이라이트</div>
+        <div id="overviewHighlight"></div>
+      </div>
+      <div class="overview-note">
+        <div class="label">메모 / 후기</div>
+        <div id="overviewMemo"></div>
+      </div>
+      <button class="edit-btn" id="overviewEditBtn">기본 정보 수정</button>
+    </div>
+
+    <div class="tab-panel" id="panel-media">
+      <div class="media-grid" id="mediaGrid"></div>
+      <input type="file" id="mediaInput" accept="image/*,video/*" multiple style="display:none;">
+      <p class="media-note">사진·영상은 이 세션 동안만 미리보기로 표시돼요. (초안 단계 - 새로고침 시 다시 첨부해야 해요)</p>
+    </div>
+
+    <div class="tab-panel" id="panel-ledger">
+      <div class="ledger-form">
+        <div class="field-group">
+          <label>날짜</label>
+          <input type="date" id="expDate">
+        </div>
+        <div class="field-group">
+          <label>항목</label>
+          <select id="expCategory">
+            <option>식비</option>
+            <option>교통</option>
+            <option>숙소</option>
+            <option>쇼핑</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>금액</label>
+          <input type="number" id="expAmount" placeholder="원">
+        </div>
+        <div class="field-group">
+          <label>메모</label>
+          <input type="text" id="expMemo" placeholder="선택 입력">
+        </div>
+        <button id="expAddBtn">추가</button>
+      </div>
+      <table class="ledger-table" id="ledgerTable">
+        <thead>
+          <tr><th>날짜</th><th>항목</th><th class="amount">금액</th><th>메모</th><th></th></tr>
+        </thead>
+        <tbody id="ledgerBody"></tbody>
+        <tfoot>
+          <tr><td colspan="2">합계</td><td class="amount" id="ledgerTotal">0원</td><td colspan="2"></td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="tab-panel" id="panel-timeline">
+      <div id="timelineBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const KEY_CUSTOM = 'travelDiary.customTrips';
+  const KEY_USERDATA = 'travelDiary.userData';
+
+  const REGION_DEFAULT_EMOJI = {
+    '국내': '📍', '아시아': '🌏', '유럽': '🏰', '남미': '🌎', '아프리카': '🌍'
+  };
+
+  const DEFAULT_TRIPS = [
+    { id: 'seoul', region: '국내', name: '서울', emoji: '🏙️', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Gyeongbokgung-Gwanghwamun-01.jpg/500px-Gyeongbokgung-Gwanghwamun-01.jpg' },
+    { id: 'busan', region: '국내', name: '부산', emoji: '🌉', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Gwangalli_Beach_and_Gwangan_Bridge_Busan.jpg/500px-Gwangalli_Beach_and_Gwangan_Bridge_Busan.jpg' },
+    { id: 'gyeongju', region: '국내', name: '경주', emoji: '🏯', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Cheongungyo_and_Baegungyo%2C_Bulguksa.jpg/500px-Cheongungyo_and_Baegungyo%2C_Bulguksa.jpg' },
+    { id: 'jeju', region: '국내', name: '제주도', emoji: '🏝️', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Seongsan_Ilchulbong_01.jpg/500px-Seongsan_Ilchulbong_01.jpg' },
+
+    { id: 'hongkong', region: '아시아', name: '홍콩', emoji: '🇭🇰', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Hong_Kong_Skyline_Restitch_-_Dec_2007.jpg/500px-Hong_Kong_Skyline_Restitch_-_Dec_2007.jpg' },
+    { id: 'macau', region: '아시아', name: '마카오', emoji: '🇲🇴', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Ruins_of_St_Paul%27s%2C_Macau_%2830843847251%29.jpg/500px-Ruins_of_St_Paul%27s%2C_Macau_%2830843847251%29.jpg' },
+    { id: 'vietnam', region: '아시아', name: '베트남', emoji: '🇻🇳', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Halong_Bay_in_Vietnam.jpg/500px-Halong_Bay_in_Vietnam.jpg' },
+    { id: 'japan', region: '아시아', name: '일본', emoji: '🇯🇵', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Kawaguchiko_%26_Fuji%2C_Japan_%2848852139947%29.jpg/500px-Kawaguchiko_%26_Fuji%2C_Japan_%2848852139947%29.jpg' },
+
+    { id: 'france', region: '유럽', name: '프랑스', emoji: '🇫🇷', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Tour_Eiffel_Wikimedia_Commons.jpg/500px-Tour_Eiffel_Wikimedia_Commons.jpg' },
+    { id: 'germany', region: '유럽', name: '독일', emoji: '🇩🇪', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Neuschwanstein_Castle_2024-02.jpg/500px-Neuschwanstein_Castle_2024-02.jpg' },
+    { id: 'belgium', region: '유럽', name: '벨기에', emoji: '🇧🇪', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Grand-Place%2C_Brussels_-_panorama%2C_June_2018.jpg/500px-Grand-Place%2C_Brussels_-_panorama%2C_June_2018.jpg' },
+    { id: 'netherlands', region: '유럽', name: '네덜란드', emoji: '🇳🇱', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/KinderdijkMolens02.jpg/500px-KinderdijkMolens02.jpg' },
+    { id: 'luxembourg', region: '유럽', name: '룩셈부르크', emoji: '🇱🇺', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Luxembourg_City_from_Adolphe_Bridge_01.jpg/500px-Luxembourg_City_from_Adolphe_Bridge_01.jpg' },
+    { id: 'iceland', region: '유럽', name: '아이슬란드', emoji: '🇮🇸', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Jokulsarlon_lake%2C_Iceland.jpg/500px-Jokulsarlon_lake%2C_Iceland.jpg' },
+    { id: 'uk', region: '유럽', name: '영국', emoji: '🇬🇧', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Big_Ben_and_the_Houses_of_Parliament_-_geograph.org.uk_-_374758.jpg/500px-Big_Ben_and_the_Houses_of_Parliament_-_geograph.org.uk_-_374758.jpg' },
+    { id: 'czech', region: '유럽', name: '체코', emoji: '🇨🇿', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Prague_Castle_and_Charles_Bridge%2C_Czech_Republic_-_Diliff.jpg/500px-Prague_Castle_and_Charles_Bridge%2C_Czech_Republic_-_Diliff.jpg' },
+    { id: 'austria', region: '유럽', name: '오스트리아', emoji: '🇦🇹', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Hallstatt_%28254929577%29.jpeg/500px-Hallstatt_%28254929577%29.jpeg' },
+    { id: 'hungary', region: '유럽', name: '헝가리', emoji: '🇭🇺', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/HUN-2015-Budapest-Hungarian_Parliament_%28Budapest%29_2015-02.jpg/500px-HUN-2015-Budapest-Hungarian_Parliament_%28Budapest%29_2015-02.jpg' },
+
+    { id: 'peru', region: '남미', name: '페루', emoji: '🇵🇪', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Peru_Machu_Picchu_Sunrise.jpg/500px-Peru_Machu_Picchu_Sunrise.jpg' },
+    { id: 'bolivia', region: '남미', name: '볼리비아', emoji: '🇧🇴', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Salar_de_Uyuni%2C_Bolivia%2C_2016-02-04%2C_DD_10-12_HDR.JPG/500px-Salar_de_Uyuni%2C_Bolivia%2C_2016-02-04%2C_DD_10-12_HDR.JPG' },
+    { id: 'chile', region: '남미', name: '칠레', emoji: '🇨🇱', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Cuernos_del_Paine_in_Torres_del_Paine_National_Park.jpg/500px-Cuernos_del_Paine_in_Torres_del_Paine_National_Park.jpg' },
+    { id: 'argentina', region: '남미', name: '아르헨티나', emoji: '🇦🇷', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Perito_Moreno_Glacier_Patagonia_Argentina_Luca_Galuzzi_2005.JPG/500px-Perito_Moreno_Glacier_Patagonia_Argentina_Luca_Galuzzi_2005.JPG' },
+    { id: 'brazil', region: '남미', name: '브라질', emoji: '🇧🇷', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Christ_the_Redeemer_-_Cristo_Redentor.jpg/500px-Christ_the_Redeemer_-_Cristo_Redentor.jpg' },
+
+    { id: 'morocco', region: '아프리카', name: '모로코', emoji: '🇲🇦', img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Chefchaouen_-_blue_city_in_Morocco.jpg/500px-Chefchaouen_-_blue_city_in_Morocco.jpg' },
+  ];
+
+  let customTrips = JSON.parse(localStorage.getItem(KEY_CUSTOM) || '[]');
+  let userData = JSON.parse(localStorage.getItem(KEY_USERDATA) || '{}');
+  const mediaStore = {};
+
+  function saveCustomTrips() { localStorage.setItem(KEY_CUSTOM, JSON.stringify(customTrips)); }
+  function saveUserData() { localStorage.setItem(KEY_USERDATA, JSON.stringify(userData)); }
+
+  function getUserData(id) {
+    if (!userData[id]) {
+      userData[id] = { filled: false, info: {}, expenses: [] };
+    }
+    if (!userData[id].expenses) userData[id].expenses = [];
+    if (!userData[id].info) userData[id].info = {};
+    return userData[id];
+  }
+  function getMedia(id) {
+    if (!mediaStore[id]) mediaStore[id] = [];
+    return mediaStore[id];
+  }
+  function allTrips() { return DEFAULT_TRIPS.concat(customTrips); }
+  function findTrip(id) { return allTrips().find(t => t.id === id); }
+
+  let currentFilter = 'all';
+  let currentView = 'grid';
+
+  function thumbHtml(trip) {
+    return trip.img ? `<img src="${trip.img}" alt="${trip.name}">` : trip.emoji;
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('tripGrid');
+    grid.classList.toggle('list-view', currentView === 'list');
+    grid.innerHTML = '';
+    allTrips()
+      .filter(t => currentFilter === 'all' || t.region === currentFilter)
+      .forEach(trip => {
+        const ud = getUserData(trip.id);
+        const card = document.createElement('article');
+        card.className = 'trip-card';
+        card.innerHTML = `
+          <div class="thumb">${thumbHtml(trip)}</div>
+          <div class="body">
+            <div class="date">${ud.filled ? (ud.info.date || '기록됨') : '작성 전'}</div>
+            <h2>${trip.name}</h2>
+            <p class="teaser">${ud.filled ? (ud.info.highlight || '기록을 확인해보세요.') : '아직 기록이 없어요. 클릭해서 첫 기록을 남겨보세요.'}</p>
+            <div class="tags"><span>${trip.region}</span><span>${trip.name}</span></div>
+          </div>
+        `;
+        card.addEventListener('click', () => handleCardClick(trip));
+        grid.appendChild(card);
+      });
+  }
+
+  function handleCardClick(trip) {
+    const ud = getUserData(trip.id);
+    if (!ud.filled) {
+      openModal('fill', trip);
+    } else {
+      openDetailPage(trip);
+    }
+  }
+
+  document.querySelectorAll('.filter-bar button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderGrid();
+    });
+  });
+
+  document.querySelectorAll('.view-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      renderGrid();
+    });
+  });
+
+  // ---- 기본 정보 입력 모달 ----
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalNameFields = document.getElementById('modalNameFields');
+  const modalTitle = document.getElementById('modalTitle');
+  const modalRegion = document.getElementById('modalRegion');
+  const modalThumb = document.getElementById('modalThumb');
+  let modalMode = 'fill';
+  let modalTrip = null;
+
+  function openModal(mode, trip) {
+    modalMode = mode;
+    modalTrip = trip || null;
+
+    document.getElementById('fieldDate').value = '';
+    document.getElementById('fieldDuration').value = '';
+    document.getElementById('fieldCompanions').value = '';
+    document.getElementById('fieldBudget').value = '';
+    document.getElementById('fieldHighlight').value = '';
+    document.getElementById('fieldMemo').value = '';
+
+    if (mode === 'create') {
+      modalNameFields.style.display = 'block';
+      document.getElementById('newRegion').value = '국내';
+      document.getElementById('newName').value = '';
+      modalTitle.textContent = '새 여행 추가';
+      modalRegion.textContent = '';
+      modalThumb.textContent = '📍';
+    } else {
+      modalNameFields.style.display = 'none';
+      modalTitle.textContent = trip.name;
+      modalRegion.textContent = trip.region;
+      modalThumb.innerHTML = thumbHtml(trip);
+      if (mode === 'edit') {
+        const ud = getUserData(trip.id);
+        document.getElementById('fieldDate').value = ud.info.date || '';
+        document.getElementById('fieldDuration').value = ud.info.duration || '';
+        document.getElementById('fieldCompanions').value = ud.info.companions || '';
+        document.getElementById('fieldBudget').value = ud.info.budget || '';
+        document.getElementById('fieldHighlight').value = ud.info.highlight || '';
+        document.getElementById('fieldMemo').value = ud.info.memo || '';
+      }
+    }
+    modalOverlay.classList.add('open');
+  }
+  function closeModal() { modalOverlay.classList.remove('open'); }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+
+  document.getElementById('modalSave').addEventListener('click', () => {
+    const info = {
+      date: document.getElementById('fieldDate').value.trim(),
+      duration: document.getElementById('fieldDuration').value.trim(),
+      companions: document.getElementById('fieldCompanions').value.trim(),
+      budget: document.getElementById('fieldBudget').value.trim(),
+      highlight: document.getElementById('fieldHighlight').value.trim(),
+      memo: document.getElementById('fieldMemo').value.trim(),
+    };
+
+    if (modalMode === 'create') {
+      const name = document.getElementById('newName').value.trim();
+      if (!name) { alert('여행지 이름을 입력해주세요.'); return; }
+      const region = document.getElementById('newRegion').value;
+      const id = 'custom-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
+      const newTrip = { id, region, name, emoji: REGION_DEFAULT_EMOJI[region] || '📍', img: null };
+      customTrips.push(newTrip);
+      saveCustomTrips();
+      const ud = getUserData(id);
+      ud.filled = true;
+      ud.info = info;
+      saveUserData();
+      closeModal();
+      renderGrid();
+      openDetailPage(newTrip);
+    } else {
+      const ud = getUserData(modalTrip.id);
+      ud.filled = true;
+      ud.info = info;
+      saveUserData();
+      closeModal();
+      renderGrid();
+      if (modalMode === 'edit' && document.getElementById('detailPage').classList.contains('open')) {
+        renderOverview(modalTrip);
+      } else {
+        openDetailPage(modalTrip);
+      }
+    }
+  });
+
+  document.getElementById('addTripBtn').addEventListener('click', () => openModal('create', null));
+
+  // ---- 사용법 모달 ----
+  const infoOverlay = document.getElementById('infoOverlay');
+  document.getElementById('infoBtn').addEventListener('click', () => infoOverlay.classList.add('open'));
+  document.getElementById('infoClose').addEventListener('click', () => infoOverlay.classList.remove('open'));
+  infoOverlay.addEventListener('click', e => { if (e.target === infoOverlay) infoOverlay.classList.remove('open'); });
+
+  // ---- 상세 페이지 ----
+  const detailPage = document.getElementById('detailPage');
+  let currentTrip = null;
+
+  function openDetailPage(trip) {
+    currentTrip = trip;
+    document.getElementById('detailThumb').innerHTML = thumbHtml(trip);
+    document.getElementById('detailName').textContent = trip.name;
+    document.getElementById('detailRegion').textContent = trip.region;
+
+    renderOverview(trip);
+    renderMedia(trip);
+    renderLedger(trip);
+    renderTimeline(trip);
+
+    document.querySelectorAll('.detail-tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelector('.detail-tabs button[data-tab="overview"]').classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-overview').classList.add('active');
+
+    detailPage.classList.add('open');
+    detailPage.scrollTop = 0;
+  }
+
+  document.getElementById('detailBack').addEventListener('click', () => {
+    detailPage.classList.remove('open');
+    renderGrid();
+  });
+
+  document.querySelectorAll('.detail-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.detail-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  function renderOverview(trip) {
+    const ud = getUserData(trip.id);
+    const grid = document.getElementById('overviewGrid');
+    const fields = [
+      ['여행 날짜', ud.info.date],
+      ['여행 기간', ud.info.duration],
+      ['동행', ud.info.companions],
+      ['예산', ud.info.budget],
+    ];
+    grid.innerHTML = fields.map(([label, value]) => `
+      <div class="overview-item">
+        <div class="label">${label}</div>
+        <div class="value">${value || '-'}</div>
+      </div>
+    `).join('');
+    document.getElementById('overviewHighlight').textContent = ud.info.highlight || '아직 작성된 내용이 없어요.';
+    document.getElementById('overviewMemo').textContent = ud.info.memo || '아직 작성된 내용이 없어요.';
+  }
+  document.getElementById('overviewEditBtn').addEventListener('click', () => openModal('edit', currentTrip));
+
+  function renderMedia(trip) {
+    const media = getMedia(trip.id);
+    const grid = document.getElementById('mediaGrid');
+    grid.innerHTML = '';
+    media.forEach(m => {
+      const tile = document.createElement('div');
+      tile.className = 'media-tile';
+      tile.innerHTML = m.type === 'video'
+        ? `<video src="${m.url}" muted controls></video>`
+        : `<img src="${m.url}" alt="${m.name}">`;
+      grid.appendChild(tile);
+    });
+    const addTile = document.createElement('div');
+    addTile.className = 'media-tile media-add';
+    addTile.textContent = '＋';
+    addTile.addEventListener('click', () => document.getElementById('mediaInput').click());
+    grid.appendChild(addTile);
+  }
+
+  document.getElementById('mediaInput').addEventListener('change', (e) => {
+    const media = getMedia(currentTrip.id);
+    Array.from(e.target.files).forEach(file => {
+      media.push({
+        type: file.type.startsWith('video') ? 'video' : 'image',
+        url: URL.createObjectURL(file),
+        name: file.name,
+      });
+    });
+    e.target.value = '';
+    renderMedia(currentTrip);
+  });
+
+  function renderLedger(trip) {
+    const ud = getUserData(trip.id);
+    const body = document.getElementById('ledgerBody');
+    const sorted = [...ud.expenses].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    body.innerHTML = sorted.map(exp => `
+      <tr>
+        <td>${exp.date || '-'}</td>
+        <td>${exp.category}</td>
+        <td class="amount">${exp.amount.toLocaleString()}원</td>
+        <td>${exp.memo || ''}</td>
+        <td><button class="del-btn" data-id="${exp.id}">삭제</button></td>
+      </tr>
+    `).join('') || `<tr><td colspan="5" class="empty-state">아직 가계부 기록이 없어요.</td></tr>`;
+
+    const total = ud.expenses.reduce((sum, e) => sum + e.amount, 0);
+    document.getElementById('ledgerTotal').textContent = total.toLocaleString() + '원';
+
+    body.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        ud.expenses = ud.expenses.filter(e => e.id !== btn.dataset.id);
+        saveUserData();
+        renderLedger(trip);
+        renderTimeline(trip);
+      });
+    });
+  }
+
+  document.getElementById('expAddBtn').addEventListener('click', () => {
+    const date = document.getElementById('expDate').value;
+    const category = document.getElementById('expCategory').value;
+    const amount = Number(document.getElementById('expAmount').value);
+    const memo = document.getElementById('expMemo').value.trim();
+    if (!date || !amount) { alert('날짜와 금액을 입력해주세요.'); return; }
+
+    const ud = getUserData(currentTrip.id);
+    ud.expenses.push({ id: 'exp-' + Date.now() + '-' + Math.floor(Math.random() * 10000), date, category, amount, memo });
+    saveUserData();
+
+    document.getElementById('expDate').value = '';
+    document.getElementById('expAmount').value = '';
+    document.getElementById('expMemo').value = '';
+
+    renderLedger(currentTrip);
+    renderTimeline(currentTrip);
+  });
+
+  function renderTimeline(trip) {
+    const ud = getUserData(trip.id);
+    const container = document.getElementById('timelineBody');
+    if (!ud.expenses.length) {
+      container.innerHTML = `<p class="empty-state">가계부에 날짜별 기록을 추가하면 여기에 표시돼요.</p>`;
+      return;
+    }
+    const byDate = {};
+    ud.expenses.forEach(exp => {
+      const key = exp.date || '날짜 미정';
+      if (!byDate[key]) byDate[key] = [];
+      byDate[key].push(exp);
+    });
+    const dates = Object.keys(byDate).sort();
+    container.innerHTML = dates.map(date => {
+      const entries = byDate[date];
+      const subtotal = entries.reduce((sum, e) => sum + e.amount, 0);
+      return `
+        <div class="timeline-day">
+          <div class="day-head">
+            <span>${date}</span>
+            <span class="sub">${subtotal.toLocaleString()}원</span>
+          </div>
+          ${entries.map(e => `
+            <div class="timeline-entry">
+              <span>${e.category}${e.memo ? ' · <span class="memo">' + e.memo + '</span>' : ''}</span>
+              <span>${e.amount.toLocaleString()}원</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderGrid();
+
+  // ---- 히어로 스포트라이트 ----
+  const SPOTLIGHT_IDS = ['jeju', 'japan', 'france', 'iceland', 'peru', 'brazil', 'hongkong', 'morocco'];
+  let spotlightIndex = 0;
+
+  function renderSpotlight() {
+    const trip = findTrip(SPOTLIGHT_IDS[spotlightIndex]);
+    document.getElementById('spotlightImg').src = trip.img;
+    document.getElementById('spotlightImg').alt = trip.name;
+    document.getElementById('spotlightCaption').textContent = trip.name;
+    document.querySelectorAll('.spotlight-thumb').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === trip.id);
+    });
+  }
+
+  document.getElementById('spotlightGrid').innerHTML = SPOTLIGHT_IDS.map(id => {
+    const trip = findTrip(id);
+    return `<div class="spotlight-thumb" data-id="${id}"><img src="${trip.img}" alt="${trip.name}"></div>`;
+  }).join('');
+
+  document.querySelectorAll('.spotlight-thumb').forEach(el => {
+    el.addEventListener('click', () => {
+      spotlightIndex = SPOTLIGHT_IDS.indexOf(el.dataset.id);
+      renderSpotlight();
+    });
+  });
+  document.getElementById('spotlightPrev').addEventListener('click', () => {
+    spotlightIndex = (spotlightIndex - 1 + SPOTLIGHT_IDS.length) % SPOTLIGHT_IDS.length;
+    renderSpotlight();
+  });
+  document.getElementById('spotlightNext').addEventListener('click', () => {
+    spotlightIndex = (spotlightIndex + 1) % SPOTLIGHT_IDS.length;
+    renderSpotlight();
+  });
+  document.getElementById('spotlightPhoto').addEventListener('click', () => {
+    handleCardClick(findTrip(SPOTLIGHT_IDS[spotlightIndex]));
+  });
+
+  renderSpotlight();
+</script>
+
+</body>
+</html>

@@ -59,17 +59,17 @@
   .tree::-webkit-scrollbar{width:8px}.tree::-webkit-scrollbar-thumb{background:var(--gray-3);border-radius:8px}
 
   .cat{margin-bottom:2px}
-  .cat-head{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;font-weight:700;font-size:14px;color:var(--gray-9);transition:.12s;width:100%;text-align:left}
-  .cat-head:hover{background:var(--gray-05)}
-  .cat-emoji{font-size:15px;width:18px;text-align:center}
-  .cat-arrow{margin-left:auto;color:var(--gray-4);font-size:11px;transition:.2s}
-  .cat.open .cat-arrow{transform:rotate(90deg)}
-  .cat-items{display:none;padding:2px 0 6px 22px;margin-left:8px;border-left:1.5px solid var(--gray-2)}
-  .cat.open .cat-items{display:block}
-  .leaf{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--gray-7);font-weight:500;transition:.12s;width:100%;text-align:left}
+  .cat-head{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-weight:500;font-size:12.5px;color:var(--gray-7);transition:.12s;width:100%;text-align:left}
+  .cat-head:hover{background:var(--gray-05);color:var(--gray-9)}
+  .cat-emoji{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+  .cat-arrow{margin-left:auto;color:var(--gray-4);font-size:11px;transition:.2s;flex-shrink:0}
+  .cat.open > .cat-head .cat-arrow{transform:rotate(90deg)}
+  .cat-items{display:none;padding:2px 0 6px 14px;margin-left:6px;border-left:1.5px solid var(--gray-2)}
+  .cat.open > .cat-items{display:block}
+  .leaf{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:12.5px;color:var(--gray-7);font-weight:500;transition:.12s;width:100%;text-align:left}
   .leaf:hover{background:var(--gray-05);color:var(--gray-9)}
   .leaf.on{background:var(--blue-weak);color:var(--blue-deep);font-weight:700}
-  .leaf .dot{width:5px;height:5px;border-radius:50%;background:var(--gray-4);flex-shrink:0}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--gray-4);flex-shrink:0}
   .leaf.on .dot{background:var(--blue)}
 
   .side-divider{margin:14px 20px 10px;border-top:1px solid var(--gray-2)}
@@ -155,8 +155,8 @@
       <div class="brand-sub">회계/세무 Wiki</div>
     </div>
     <div class="company-switch">
-      <button class="on" onclick="switchCompany(this,'키다리스튜디오','K','#3182F6')">키다리</button>
-      <button onclick="switchCompany(this,'레진엔터테인먼트','L','#8B5CF6')">레진</button>
+      <button class="on" onclick="switchCompany(this,'키다리스튜디오','K','#3182F6','kidari')">키다리</button>
+      <button onclick="switchCompany(this,'레진엔터테인먼트','L','#8B5CF6','lezhin')">레진</button>
     </div>
   </div>
 
@@ -202,7 +202,8 @@
 
 <script>
 /* ================= 트리 정의 =================
- * key = tab + '|' + view  (acc|type, acc|team, tax|type, tax|team) */
+ * 유형별(acc|type)은 키다리/레진 회사별로 구조가 다름 → getTree()에서 회사 분기.
+ * 각 노드: {id, name, emoji?, children?, subteams?}. children이 있으면 토글(대/중분류), 없으면 리프(페이지). */
 const COMMON_ACC = [
   {id:'acc-c-invoice', name:'세금계산서·증빙'},
   {id:'acc-c-fx',      name:'해외 정산·환율 처리'},
@@ -214,41 +215,102 @@ const COMMON_TAX = [
   {id:'tax-c-terms',   name:'용어 사전'},
 ];
 
-const CATS_BIZ = [
-  {id:'platform', name:'플랫폼',   emoji:'📱'},
-  {id:'dist',     name:'유통',     emoji:'📦'},
-  {id:'video',    name:'영상',     emoji:'🎬'},
-  {id:'snack',    name:'레진스낵', emoji:'🍿'},
-  {id:'md',       name:'MD',       emoji:'🛍️'},
-];
-/* 실제 조직도 기반 (대표이사 직속 조직 단위). 대표이사 등 개인 성함은 매뉴얼 트리에 넣지 않음 */
-const TEAMS = [
-  {id:'mgmt',      name:'경영관리본부',           emoji:'🏢', leaves:['판관비']},
-  {id:'platform',  name:'플랫폼사업본부',         emoji:'📱', leaves:['매출','원가','판관비']},
-  {id:'commerce',  name:'커머스사업본부',         emoji:'🛒', leaves:['매출','원가','판관비']},
-  {id:'content',   name:'콘텐츠부문',            emoji:'📚', leaves:['매출','원가','판관비']},
-  {id:'video',     name:'영상콘텐츠사업본부',     emoji:'🎬', leaves:['매출','원가','판관비']},
-  {id:'tech',      name:'기술부문',               emoji:'💻', leaves:['원가(자산화 판단)','판관비']},
-  {id:'newbiz',    name:'신사업TF',               emoji:'🚀', leaves:['매출','원가','판관비']},
-  {id:'asiadev',   name:'아시아사업개발',         emoji:'🌏', leaves:['매출','원가','판관비']},
-  {id:'lezhinjp',  name:'LEZHIN JP',              emoji:'🇯🇵', leaves:['매출','원가','판관비']},
-  {id:'kidarith',  name:'KIDARISTUDIO(Thailand)', emoji:'🇹🇭', leaves:['매출','원가','판관비']},
-  {id:'delitoon',  name:'델리툰법인',             emoji:'🏳️', leaves:['매출','원가','판관비']},
-  {id:'etc',       name:'기타',                   emoji:'📎', leaves:['판관비']},
-  {id:'hr',        name:'인사지원실',             emoji:'🧑‍💼', leaves:['판관비']},
+// 유형별 리프는 전부 같은 모양(매출/MG상각/정산/회계처리 유의사항 4가지)의 페이지를 열도록
+// getTree()==='acc|type'일 때는 renderTypeLeafDoc()이 처리하므로 트리 자체는 대분류→소분류 2단만 있으면 된다.
+const KIDARI_TYPE_TREE = [
+  {id:'platform', name:'플랫폼', emoji:'📱', children:[
+    {id:'KR', name:'봄툰KR'},
+    {id:'TH', name:'봄툰TH'},
+    {id:'TW', name:'봄툰TW'},
+  ]},
+  {id:'dist', name:'유통', emoji:'📦', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외', children:[
+      {id:'일본', name:'일본'},
+      {id:'기타', name:'기타'},
+    ]},
+  ]},
+  {id:'pub', name:'소설', emoji:'📖', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외'},
+  ]},
+  {id:'video', name:'영상 및 부가판권', emoji:'🎬', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외'},
+  ]},
+  {id:'studiom', name:'스튜디오M', emoji:'🎨', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외'},
+  ]},
+  {id:'etc', name:'기타(공통)', emoji:'📎'},
 ];
 
+const LEZHIN_TYPE_TREE = [
+  {id:'platform', name:'플랫폼', emoji:'📱', children:[
+    {id:'KR', name:'레진KR'},
+    {id:'JP', name:'레진JP'},
+    {id:'US', name:'레진US'},
+    {id:'ES', name:'레진ES'},
+  ]},
+  {id:'dist', name:'유통', emoji:'📦', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외', children:[
+      {id:'JP', name:'JP'},
+      {id:'US', name:'US'},
+    ]},
+  ]},
+  {id:'md', name:'MD', emoji:'🛍️', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외'},
+  ]},
+  {id:'snacknew', name:'숏폼 & 신사업(레진스낵)', emoji:'🍿', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외'},
+  ]},
+  {id:'translate', name:'번역/외주', emoji:'🌐', children:[
+    {id:'국내', name:'국내'},
+    {id:'해외', name:'해외'},
+  ]},
+  {id:'etc', name:'기타(공통)', emoji:'📎'},
+];
+
+/* 팀별(조직도) — 대분류(사업본부/부문 단위) 아래에 소분류(사업부).
+ * 소분류에 subteams가 있으면 해당 페이지 안에서 팀 단위로 추가 구분해서 보여줌. */
+const ORG_TREE = [
+  {id:'g1', name:'플랫폼사업본부', emoji:'📱', children:[
+    {id:'bomtoon', name:'봄툰사업본부', subteams:['봄툰영업팀','플랫폼기획팀']},
+    {id:'lezhinbiz', name:'레진사업본부', subteams:['레진사업팀','레진기획팀','레진마케팅팀','레진CR팀']},
+    {id:'japanbiz', name:'일본사업본부', subteams:['일본사업팀','스튜디오레진','LEZHIN JP']},
+    {id:'globalcontent', name:'글로벌콘텐츠부', subteams:['미주','아시아','유럽콘텐츠팀','현지화전략운영팀']},
+    {id:'overseasent', name:'해외법인', subteams:['KIDARISTUDIO Thailand','DeliToon']},
+  ]},
+  {id:'g2', name:'콘텐츠사업부문', emoji:'📚', children:[
+    {id:'contentdist', name:'콘텐츠유통사업부', subteams:['국내사업팀','해외사업팀','해외출판사업팀']},
+    {id:'contentsource', name:'콘텐츠소싱본부', subteams:['편집부','플랫폼소싱팀 소싱1팀','플랫폼소싱팀 소싱2팀']},
+    {id:'studiom', name:'스튜디오M', subteams:['AM센터','AI콘텐츠제작팀']},
+    {id:'novel', name:'소설사업부', subteams:['소설사업팀']},
+  ]},
+  {id:'g3', name:'커머스사업본부', emoji:'🛒', children:[
+    {id:'md', name:'MD사업부'},
+    {id:'shortform', name:'숏폼사업부', subteams:['레진스낵']},
+    {id:'globalnewbiz', name:'글로벌신사업부'},
+  ]},
+  {id:'g4', name:'영상콘텐츠사업본부 & 부가판권', emoji:'🎬', children:[
+    {id:'video', name:'영상사업부', subteams:['투자관리팀','기획제작팀']},
+    {id:'digital', name:'디지털사업부'},
+    {id:'digigoods', name:'디지털굿즈사업부'},
+  ]},
+  {id:'g5', name:'경영지원 & 기술(공통)', emoji:'🏛️', children:[
+    {id:'mgmt', name:'경영관리본부'},
+    {id:'strategy', name:'해외전략사업본부'},
+    {id:'newbiztf', name:'신사업TF'},
+    {id:'tech', name:'기술부문'},
+    {id:'brand', name:'브랜드콘텐츠부문', subteams:['미디어제작','디자인1팀','디자인2팀']},
+  ]},
+];
+
+// 세무 · 유형별은 이번 개편 대상이 아니라 기존 구조 유지
 const TREES = {
-  'acc|type': {
-    note:null,
-    groups: CATS_BIZ.map(c=>({...c, leaves:['매출','MG(미니멈개런티)','정산','손익효과','회계처리 유의사항']})),
-    common: COMMON_ACC
-  },
-  'acc|team': {
-    note:null,
-    groups: TEAMS,
-    common: COMMON_ACC
-  },
   'tax|type': {
     note:null,
     groups: [
@@ -259,18 +321,13 @@ const TREES = {
     ],
     common: COMMON_TAX
   },
-  'tax|team': {
-    note:null,
-    groups: TEAMS.map(t=>({...t, leaves:['거래 과세유형','원천징수 대상','증빙 관리']})),
-    common: COMMON_TAX
-  },
 };
 
 /* ================= 문서 본문 ================= */
 const DOCS = {
-  /* ---------- 회계: 유형별 ---------- */
-  'platform/매출': {
-    title:'플랫폼 — 매출 구조', crumb:['회계','플랫폼','매출'], chips:[['blue','매출인식']],
+  /* ---------- 회계: 유형별 · 키다리 (아래 4개는 topics로 구성 → 매출/MG상각/정산/회계처리 유의사항 순서로 한 페이지에 표시) ---------- */
+  'kidari/platform/KR': {
+    title:'봄툰KR', crumb:['회계','키다리','플랫폼','봄툰KR'], chips:[['blue','매출인식']],
     journal:[
       {type:'코인 충전(유저 결제)', debit:'현금/미수금', credit:'선수수익(부채)', note:'서비스 제공 전이므로 아직 매출 아님 — 소진 시 매출로 전환'},
       {type:'코인 소진(작품 열람)', debit:'선수수익', credit:'매출', note:'열람과 동시에 이행의무 충족 → 매출 인식 (원가도 동시 인식)'},
@@ -279,9 +336,10 @@ const DOCS = {
       {type:'광고 매출', debit:'미수금', credit:'매출', note:'월별 광고 실적 확정 기준으로 인식'},
       {type:'MG 회수불능(손상차손)', debit:'MG손상차손', credit:'선급비용(MG)', note:'손상 테스트 결과 회수 가능성이 낮으면 즉시 비용 인식'}
     ],
-    body:`
+    topics:{
+      '매출': `
       <div class="card"><h3><span class="bar"></span>매출 구조</h3>
-        <p>플랫폼(자사 앱/웹)에서 발생하는 <strong>코인 결제 매출</strong>이 기본 단위입니다. 이용자가 충전한 코인으로 콘텐츠를 열람하면 그 시점에 매출로 인식합니다.</p>
+        <p>봄툰(자사 앱/웹)에서 발생하는 <strong>코인 결제 매출</strong>이 기본 단위입니다. 이용자가 충전한 코인으로 콘텐츠를 열람하면 그 시점에 매출로 인식합니다.</p>
         <div class="flow"><span class="step">코인 충전</span><span class="arrow">→</span><span class="step">콘텐츠 열람(코인 차감)</span><span class="arrow">→</span><span class="step hl">매출 인식</span><span class="arrow">→</span><span class="step">CP 정산</span></div>
       </div>
       <div class="card"><h3><span class="bar"></span>손익 효과 (예시)</h3>
@@ -357,18 +415,9 @@ const DOCS = {
             <td>소진율 모니터링 필요, 미소진 코인 잔액 관리</td>
           </tr>
         </table>
-        <div class="callout"><span class="ic">✏️</span><p>이 표는 스크린샷 일부만 반영된 상태입니다 — 원본에 더 많은 계정과목(추가 행)이 있다면 이어서 정리해 드릴게요.</p></div>
-      </div>`
-  },
-  'platform/MG(미니멈개런티)': {
-    title:'플랫폼 — MG(미니멈개런티)', crumb:['회계','플랫폼','MG'], chips:[['blue','MG'],['amber','봄툰 우선 반영']],
-    body:`
-      <div class="card"><h3><span class="bar"></span>국내·해외 법인, 뭐가 다른가</h3>
-        <p>봄툰은 <strong>KR(국내)</strong>과 <strong>TW·TH(해외)</strong>의 정산 주기·계산 로직·세금 처리가 전혀 다릅니다. 아래는 정산 SOP 원본 기준 요약입니다.</p>
-        <div class="flow"><span class="step hl">봄툰KR — 매월 정산</span><span class="arrow">vs</span><span class="step hl">봄툰TW·TH — 분기별 정산</span></div>
-        <div class="callout"><span class="ic">✏️</span><p>이 페이지는 <strong>봄툰(KR/TW/TH) 기준으로 우선 반영</strong>했습니다. 레진KR·레진US/JP·델리툰 등 다른 플랫폼의 소속 법인·국내외 구분은 확인 후 이어서 정리합니다.</p></div>
-      </div>
-
+        <div class="callout"><span class="ic">✏️</span><p>TH·TW는 코인 구조가 유사할 수 있으나 지역별 실제 운영 방식은 확인 후 반영 필요합니다.</p></div>
+      </div>`,
+      'MG상각': `
       <div class="card"><h3><span class="bar"></span>국내 법인 — 봄툰KR</h3>
         <div class="kv">
           <div class="k">정산 주기</div><div class="v">매월</div>
@@ -377,22 +426,45 @@ const DOCS = {
           <div class="k">세금 처리</div><div class="v">작가 개인: 원천징수 3.3% · 작가 사업자: 세금계산서 수취</div>
         </div>
         <div class="callout blue"><span class="ic">📌</span><p><strong>꼭 확인할 것</strong> — 회차 카운팅 기간(전월말~당월말 전일) 확인, 수급 확정 여부.</p></div>
-      </div>
-
-      <div class="card"><h3><span class="bar"></span>해외 법인 — 봄툰TW · 봄툰TH</h3>
-        <table><tr><th></th><th>봄툰TW</th><th>봄툰TH</th></tr>
-          <tr><td>정산 주기</td><td>분기별</td><td>분기별</td></tr>
-          <tr><td>핵심 계산 로직</td>
-            <td>코인매출 = 코인수 × 5NTD<br>웹 ×0.9(수수료10%) · 앱 ×0.7(수수료30%) × 환율 × 요율</td>
-            <td>코인매출 = 코인수 × 5.9THB<br>웹/앱 동일 구조</td></tr>
-          <tr><td>데이터 소스</td><td>파트너스툴(자동계산)</td><td>파트너스툴</td></tr>
-          <tr><td>세금 처리</td><td>비거주자 대만 원천세</td><td>비거주자 태국 원천세</td></tr></table>
-        <div class="callout blue"><span class="ic">📌</span><p><strong>꼭 확인할 것</strong> — TW: 환율은 서울외국환중개소 기준 <strong>Q+2개월</strong> 적용. TH: 환율 확인 및 현지 세율 변동 체크.</p></div>
       </div>`
+    }
   },
-  'snack/매출': {
-    title:'레진스낵 — 매출·정산 구조', crumb:['회계','레진스낵','매출'], chips:[['blue','매출인식'],['green','투자정산서']],
-    body:`
+  'kidari/platform/TW': {
+    title:'봄툰TW', crumb:['회계','키다리','플랫폼','봄툰TW'], chips:[['blue','MG']],
+    topics:{
+      'MG상각': `
+      <div class="card"><h3><span class="bar"></span>해외 법인 — 봄툰TW</h3>
+        <div class="kv">
+          <div class="k">정산 주기</div><div class="v">분기별</div>
+          <div class="k">핵심 계산 로직</div><div class="v">코인매출 = 코인수 × 5NTD · 웹 ×0.9(수수료10%) · 앱 ×0.7(수수료30%) × 환율 × 요율</div>
+          <div class="k">데이터 소스</div><div class="v">파트너스툴(자동계산)</div>
+          <div class="k">세금 처리</div><div class="v">비거주자 대만 원천세</div>
+        </div>
+        <div class="callout blue"><span class="ic">📌</span><p><strong>꼭 확인할 것</strong> — 환율은 서울외국환중개소 기준 <strong>Q+2개월</strong> 적용.</p></div>
+      </div>`
+    }
+  },
+  'kidari/platform/TH': {
+    title:'봄툰TH', crumb:['회계','키다리','플랫폼','봄툰TH'], chips:[['blue','MG']],
+    topics:{
+      'MG상각': `
+      <div class="card"><h3><span class="bar"></span>해외 법인 — 봄툰TH</h3>
+        <div class="kv">
+          <div class="k">정산 주기</div><div class="v">분기별</div>
+          <div class="k">핵심 계산 로직</div><div class="v">코인매출 = 코인수 × 5.9THB · 웹/앱 동일 구조</div>
+          <div class="k">데이터 소스</div><div class="v">파트너스툴</div>
+          <div class="k">세금 처리</div><div class="v">비거주자 태국 원천세</div>
+        </div>
+        <div class="callout blue"><span class="ic">📌</span><p><strong>꼭 확인할 것</strong> — 환율 확인 및 현지 세율 변동 체크.</p></div>
+      </div>`
+    }
+  },
+
+  /* ---------- 회계: 유형별 · 레진 ---------- */
+  'lezhin/snacknew/국내': {
+    title:'레진스낵(국내)', crumb:['회계','레진','숏폼 & 신사업','국내'], chips:[['blue','매출인식'],['green','투자정산서']],
+    topics:{
+      '매출': `
       <div class="card"><h3><span class="bar"></span>매출 구조</h3>
         <p>레진스낵(숏드라마) 매출은 <strong>투자정산서 대상 매출</strong> 산정이 핵심입니다. 총 매출에서 단계별 차감을 거쳐 정산 기준 매출을 확정합니다.</p>
         <div class="flow"><span class="step">플랫폼 총매출</span><span class="arrow">→</span><span class="step">−30%</span><span class="arrow">→</span><span class="step">−30%</span><span class="arrow">→</span><span class="step hl">투자정산서 대상 매출</span></div>
@@ -405,24 +477,7 @@ const DOCS = {
           <tr class="total"><td>정산 대상 매출</td><td class="num">49</td><td>투자정산서 반영</td></tr></table>
         <div class="callout"><span class="ic">🔒</span><p>자사수수료 등 세부 요율은 <strong>비공개 항목</strong> — 대외/타 부서 공유 자료에는 기재하지 않습니다.</p></div>
       </div>`
-  },
-
-  /* ---------- 회계: 팀별(조직도) ---------- */
-  'content/원가': {
-    title:'콘텐츠부문 — 원가', crumb:['회계','팀별','콘텐츠부문','원가'], chips:[['blue','원가']],
-    body:`
-      <div class="card"><h3><span class="bar"></span>이 부문에서 발생하는 원가</h3>
-        <ul><li><strong>제작원가</strong> — 작가·제작사 지급(MG·러닝 로열티), 외주 제작비</li>
-        <li><strong>콘텐츠 자산화</strong> — 자체 IP 제작비의 무형자산/비용 처리 판단</li>
-        <li><strong>선급/미지급</strong> — MG 선지급분의 상각·정산 대사</li></ul>
-      </div>
-      <div class="card"><h3><span class="bar"></span>회계처리 포인트</h3>
-        <table><tr><th>항목</th><th>처리</th></tr>
-          <tr><td>MG 선지급</td><td>선급금 계상 후 실제 정산액과 상계</td></tr>
-          <tr><td>자체 제작 IP</td><td>자산화 요건 검토(개발비 vs 비용)</td></tr>
-          <tr><td>외주 제작비</td><td>용역 완료·검수 기준 비용 인식</td></tr></table>
-        <div class="callout blue"><span class="ic">💡</span><p>'팀별' 뷰는 조직도 기준으로 사업부가 <strong>자기 부문 손익(매출·원가·판관비)</strong>을 한 화면에서 보게 하는 뷰입니다. 유형별 뷰와 같은 문서를 다른 축으로 연결합니다. (이 페이지는 예시이며, 실제 콘텐츠부문 세부 원가 항목은 담당자 확인 후 보완 필요)</p></div>
-      </div>`
+    }
   },
 
   /* ---------- 세무: 과세유형 ---------- */
@@ -540,23 +595,70 @@ const DOCS = {
 };
 
 /* ================= 상태 ================= */
-let curTab='acc', curView='type', curKey='platform/매출';
+let curCompany='kidari';
+let curTab='acc', curView='type', curKey='kidari/platform/KR';
 const treeKey = ()=> curTab+'|'+curView;
 
+/* acc|type(회사별 분기) · acc|team/tax|team(조직도 공통) 은 여기서, tax|type은 TREES에서 가져옴 */
+function getTree(){
+  const key = treeKey();
+  if(key==='acc|type') return { note:null, groups:(curCompany==='lezhin'?LEZHIN_TYPE_TREE:KIDARI_TYPE_TREE), common:COMMON_ACC, keyPrefix: curCompany+'/' };
+  if(key==='acc|team') return { note:null, groups:ORG_TREE, common:COMMON_ACC, keyPrefix:'' };
+  if(key==='tax|team') return { note:null, groups:ORG_TREE, common:COMMON_TAX, keyPrefix:'' };
+  return TREES[key];
+}
+
 /* ================= 렌더 ================= */
+// 한 번 펼친 카테고리는 다른 항목을 클릭해도 계속 펼쳐진 상태를 유지하도록 별도로 기억한다.
+// (이전에는 트리를 다시 그릴 때마다 "현재 보고 있는 문서 경로"로만 열림 여부를 계산해서,
+//  다른 카테고리의 항목을 클릭하면 이전에 펴뒀던 카테고리가 다시 접혀버리는 문제가 있었음)
+let openCats = new Set();
+
+function ancestorFullKeys(key, tree){
+  const prefix = tree.keyPrefix||'';
+  const base = prefix? prefix.slice(0,-1) : '';
+  const keyRest = (prefix && key.startsWith(prefix)) ? key.slice(prefix.length) : key;
+  const parts = keyRest.split('/');
+  const result = [];
+  let curPath = base, nodes = tree.groups;
+  for(let i=0;i<parts.length-1;i++){
+    const node = nodes && nodes.find(n=>n.id===parts[i]);
+    if(!node) break;
+    curPath = curPath ? curPath+'/'+parts[i] : parts[i];
+    result.push(curPath);
+    nodes = node.children;
+  }
+  return result;
+}
+
+function markAncestorsOpen(key){
+  ancestorFullKeys(key, getTree()).forEach(fk=>{
+    openCats.add(fk.replace(/[^a-zA-Z0-9가-힣]/g,'_'));
+  });
+}
+
+function renderNode(node, parentPath){
+  const fullKey = parentPath ? parentPath+'/'+node.id : node.id;
+  const hasChildren = node.children && node.children.length;
+  if(!hasChildren){
+    return `<button class="leaf ${curKey===fullKey?'on':''}" onclick="openDoc('${fullKey}')"><span class="dot"></span>${node.name}</button>`;
+  }
+  const safeId = fullKey.replace(/[^a-zA-Z0-9가-힣]/g,'_');
+  const open = openCats.has(safeId) ? 'open':'';
+  return `<div class="cat ${open}" id="cat-${safeId}">
+    <button class="cat-head" onclick="toggleCat('${safeId}')">${node.emoji?`<span class="cat-emoji">${node.emoji}</span>`:'<span class="dot"></span>'}${node.name}<span class="cat-arrow">▶</span></button>
+    <div class="cat-items">${node.children.map(ch=>renderNode(ch, fullKey)).join('')}</div>
+  </div>`;
+}
+
 function renderTree(){
   const t=document.getElementById('tree');
-  const tree=TREES[treeKey()];
+  const tree=getTree();
+  const prefix=tree.keyPrefix||'';
   let html='';
   if(tree.note){ html+=`<div class="placeholder-note">${tree.note}</div>`; }
-  tree.groups.forEach((g,i)=>{
-    const open = curKey.startsWith(g.id+'/') || i===0 ? 'open':'';
-    html+=`<div class="cat ${open}" id="cat-${g.id}">
-      <button class="cat-head" onclick="toggleCat('${g.id}')"><span class="cat-emoji">${g.emoji}</span>${g.name}<span class="cat-arrow">▶</span></button>
-      <div class="cat-items">${g.leaves.map(l=>{
-        const key=g.id+'/'+l, short=l.split('(')[0];
-        return `<button class="leaf ${curKey===key?'on':''}" onclick="openDoc('${key}')"><span class="dot"></span>${short}</button>`;
-      }).join('')}</div></div>`;
+  tree.groups.forEach(g=>{
+    html+=renderNode(g, prefix ? prefix.slice(0,-1) : '');
   });
   html+=`<div class="side-divider"></div><div class="common-label">🔻 공통</div>`;
   tree.common.forEach(c=>{
@@ -591,61 +693,141 @@ function toggleJournal(){
   if(p) p.style.display = p.style.display==='none' ? 'block' : 'none';
 }
 
+// 유형별(acc|type) 리프는 어떤 대분류든 항상 매출 / MG상각 / 정산 / 회계처리 유의사항
+// 4가지를 같은 순서로 한 페이지에 보여준다. 실제 내용이 없는 항목은 자동으로 "작성 예정" 카드로 채운다.
+const TOPIC_ORDER = ['매출','MG상각','정산','회계처리 유의사항'];
+const TOPIC_LABEL = {'매출':'매출','MG상각':'MG','정산':'정산','회계처리 유의사항':'회계처리 유의사항'};
+
+function renderTopicBody(topics){
+  topics = topics || {};
+  return TOPIC_ORDER.map(key=>{
+    if(topics[key]) return topics[key];
+    return `<div class="card"><h3><span class="bar"></span>${TOPIC_LABEL[key]}</h3><p style="color:var(--gray-5)">이 항목의 매뉴얼을 작성하는 자리입니다. (구조·인식 기준·유의사항 등)</p></div>`;
+  }).join('');
+}
+
+function renderTypeLeafDoc(c){
+  const tree=getTree();
+  const prefix=tree.keyPrefix;
+  const keyRest=curKey.slice(prefix.length);
+  const parts=keyRest.split('/');
+  let names=[], nodes=tree.groups, ok=true;
+  for(const p of parts){
+    const node=nodes && nodes.find(n=>n.id===p);
+    if(!node){ ok=false; break; }
+    names.push(node.name); nodes=node.children;
+  }
+  const companyLabel = curCompany==='lezhin'?'레진':'키다리';
+  const d = DOCS[curKey];
+  const title = (d && d.title) || names[names.length-1] || curKey;
+  const crumb = (d && d.crumb) || [companyLabel, ...names];
+  const chips = (d && d.chips) || [];
+
+  c.innerHTML=`
+    <div class="crumb">${crumb.map((x,i)=>i?`<span class="sep">/</span>${x}`:x).join(' ')}</div>
+    <div class="doc-title">${title}</div>
+    <div class="doc-meta">${chips.map(ch=>renderChip(ch,!!(d&&d.journal))).join('')}<span class="chip">최종수정 2026-07-22</span></div>
+    ${d&&d.journal ? renderJournalPanel(d.journal) : ''}
+    ${renderTopicBody(d&&d.topics)}`;
+  c.scrollTop=0;
+}
+
 function renderDoc(){
   const c=document.getElementById('content');
+  if(treeKey()==='acc|type'){ renderTypeLeafDoc(c); return; }
   const d=DOCS[curKey];
   if(d){
     c.innerHTML=`
       <div class="crumb">${d.crumb.map((x,i)=>i?`<span class="sep">/</span>${x}`:x).join(' ')}</div>
       <div class="doc-title">${d.title}</div>
-      <div class="doc-meta">${d.chips.map(ch=>renderChip(ch,!!d.journal)).join('')}<span class="chip">최종수정 2026-07-21</span></div>
+      <div class="doc-meta">${d.chips.map(ch=>renderChip(ch,!!d.journal)).join('')}<span class="chip">최종수정 2026-07-22</span></div>
       ${d.journal ? renderJournalPanel(d.journal) : ''}
       ${d.body}`;
   } else {
-    const tree=TREES[treeKey()];
-    const parts=curKey.split('/');
-    const g=(tree.groups.find(x=>x.id===parts[0])||{});
-    const gName=g.name||'공통', leaf=(parts[1]||curKey).split('(')[0];
+    // 트리를 따라가며 경로상의 노드 이름을 찾아 breadcrumb·제목을 구성 (임의 깊이 대응)
+    const tree=getTree();
+    const prefix=tree.keyPrefix||'';
+    let keyRest=curKey, companyLabel='';
+    if(prefix && curKey.startsWith(prefix)){
+      keyRest=curKey.slice(prefix.length);
+      companyLabel = curCompany==='lezhin'?'레진':'키다리';
+    }
+    const parts=keyRest.split('/');
+    let names=[], nodes=tree.groups, lastNode=null, ok=true;
+    for(const p of parts){
+      const node=nodes && nodes.find(n=>n.id===p);
+      if(!node){ ok=false; break; }
+      names.push(node.name); lastNode=node; nodes=node.children;
+    }
+    if(!ok || !names.length){
+      const common=(tree.common||[]).find(x=>x.id===curKey);
+      names=[common?common.name:curKey]; lastNode=common;
+    }
+    const crumbParts = companyLabel? [companyLabel,...names] : names;
+    const title = names[names.length-1];
+    const parentLabel = names.length>1? names[names.length-2] : companyLabel;
+    const subteamsHtml = (lastNode && lastNode.subteams && lastNode.subteams.length)
+      ? `<div class="card"><h3><span class="bar"></span>세부 조직 구분</h3>${lastNode.subteams.map(st=>`
+          <div class="callout"><span class="ic">👥</span><p><strong>${st}</strong> — 담당 업무·회계 이슈는 확인 후 반영합니다.</p></div>`).join('')}</div>`
+      : '';
     c.innerHTML=`
-      <div class="crumb">${gName} <span class="sep">/</span> ${leaf}</div>
-      <div class="doc-title">${gName} — ${leaf}</div>
+      <div class="crumb">${crumbParts.map((x,i)=>i?`<span class="sep">/</span>${x}`:x).join(' ')}</div>
+      <div class="doc-title">${parentLabel?parentLabel+' — ':''}${title}</div>
       <div class="doc-meta"><span class="chip amber">작성 예정</span></div>
-      <div class="card"><h3><span class="bar"></span>개요</h3><p style="color:var(--gray-5)">이 항목의 매뉴얼을 작성하는 자리입니다. (구조·인식 기준·유의사항 등)</p></div>
-      <div class="card"><h3><span class="bar"></span>핵심 포인트</h3><p style="color:var(--gray-5)">표·흐름도·체크리스트로 실무 포인트를 정리합니다.</p></div>`;
+      ${subteamsHtml}`;
   }
   c.scrollTop=0;
 }
 
 /* ================= 인터랙션 ================= */
-function toggleCat(id){ document.getElementById('cat-'+id).classList.toggle('open'); }
-function openDoc(key){ curKey=key; renderTree(); renderDoc(); }
+function toggleCat(id){
+  const el = document.getElementById('cat-'+id);
+  el.classList.toggle('open');
+  if(el.classList.contains('open')) openCats.add(id); else openCats.delete(id);
+}
+function openDoc(key){ curKey=key; markAncestorsOpen(key); renderTree(); renderDoc(); }
 
-function firstKey(){ const tr=TREES[treeKey()]; return tr.groups[0].id+'/'+tr.groups[0].leaves[0]; }
+function firstLeafPath(node, parentPath){
+  const fullKey = parentPath? parentPath+'/'+node.id : node.id;
+  if(node.children && node.children.length) return firstLeafPath(node.children[0], fullKey);
+  return fullKey;
+}
+function firstKey(){
+  const tree=getTree();
+  const prefix=tree.keyPrefix||'';
+  const base = prefix? prefix.slice(0,-1) : '';
+  return firstLeafPath(tree.groups[0], base);
+}
 
 function switchTab(tab){
   curTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   document.getElementById('sideTitle').textContent = tab==='acc'?'회계 매뉴얼':'세무 매뉴얼';
   if(tab==='acc') setUser('재무관리부 회계팀','문동진'); else setUser('재무관리부 세무팀','이지윤');
-  curKey=firstKey(); renderTree(); renderDoc();
+  curKey=firstKey(); markAncestorsOpen(curKey); renderTree(); renderDoc();
 }
 function switchView(view){
   curView=view;
   document.querySelectorAll('.view-switch button').forEach(b=>b.classList.toggle('on',b.dataset.view===view));
-  curKey=firstKey(); renderTree(); renderDoc();
+  curKey=firstKey(); markAncestorsOpen(curKey); renderTree(); renderDoc();
 }
 function setUser(team,name){
   document.getElementById('userTeam').textContent=team;
   document.getElementById('userName').textContent=name;
   document.getElementById('userAvatar').textContent=name[0];
 }
-function switchCompany(btn,name,initial,color){
+function switchCompany(btn,name,initial,color,companyId){
   document.querySelectorAll('.company-switch button').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   document.getElementById('companyName').textContent=name;
   const logo=document.getElementById('logo'); logo.textContent=initial; logo.style.background=color;
+  curCompany=companyId;
+  if(curTab==='acc' && curView==='type'){
+    curKey=firstKey(); markAncestorsOpen(curKey); renderTree(); renderDoc();
+  }
 }
 
+markAncestorsOpen(curKey);
 renderTree(); renderDoc();
 </script>
 </body>
