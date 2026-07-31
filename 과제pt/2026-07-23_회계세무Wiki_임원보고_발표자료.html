@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>회계·세무 통합 Wiki — 임원 보고</title>
+<style>
+  :root{
+    --bg:#F5F7FA; --surface:#FFFFFF; --surface-2:#EEF2F7;
+    --ink:#14181F; --ink-soft:#5B6472; --ink-faint:#8A93A3;
+    --line:#E3E8EF; --line-strong:#CBD3DF;
+    --accent:#3182F6; --accent-deep:#1B64DA; --accent-soft:#E8F3FF;
+    --amber:#B7791F; --amber-soft:#FFF4DE;
+    --green:#0F9D58; --green-soft:#E7F7EF;
+    --shadow:0 1px 2px rgba(20,24,31,.04), 0 12px 32px rgba(20,24,31,.06);
+    --radius:20px;
+    --font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0D1015; --surface:#171B22; --surface-2:#1E232B;
+      --ink:#EEF1F6; --ink-soft:#A6AFBE; --ink-faint:#707A8C;
+      --line:#2A2F3A; --line-strong:#3A4150;
+      --accent:#5B9BFF; --accent-deep:#8FC1FF; --accent-soft:rgba(91,155,255,.14);
+      --amber:#E3A857; --amber-soft:rgba(227,168,87,.14);
+      --green:#4ADE94; --green-soft:rgba(74,222,148,.12);
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 20px 48px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0D1015; --surface:#171B22; --surface-2:#1E232B;
+    --ink:#EEF1F6; --ink-soft:#A6AFBE; --ink-faint:#707A8C;
+    --line:#2A2F3A; --line-strong:#3A4150;
+    --accent:#5B9BFF; --accent-deep:#8FC1FF; --accent-soft:rgba(91,155,255,.14);
+    --amber:#E3A857; --amber-soft:rgba(227,168,87,.14);
+    --green:#4ADE94; --green-soft:rgba(74,222,148,.12);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 20px 48px rgba(0,0,0,.4);
+  }
+  :root[data-theme="light"]{
+    --bg:#F5F7FA; --surface:#FFFFFF; --surface-2:#EEF2F7;
+    --ink:#14181F; --ink-soft:#5B6472; --ink-faint:#8A93A3;
+    --line:#E3E8EF; --line-strong:#CBD3DF;
+    --accent:#3182F6; --accent-deep:#1B64DA; --accent-soft:#E8F3FF;
+    --amber:#B7791F; --amber-soft:#FFF4DE;
+    --green:#0F9D58; --green-soft:#E7F7EF;
+    --shadow:0 1px 2px rgba(20,24,31,.04), 0 12px 32px rgba(20,24,31,.06);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--font);
+    -webkit-font-smoothing:antialiased; overflow:hidden; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  .deck{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; position:relative; padding:28px; }
+  .stage{
+    position:relative; width:min(1280px, 100%); aspect-ratio:16/9; max-height:100%;
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); overflow:hidden;
+  }
+
+  .slide{
+    position:absolute; inset:0; display:none; flex-direction:column;
+    padding:56px 76px 64px;
+  }
+  .slide.active{ display:flex; }
+  .slide.active{ animation:rise .38s ease both; }
+  @media (prefers-reduced-motion: reduce){ .slide.active{ animation:none; } }
+  @keyframes rise{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+
+  .eyebrow-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:auto; padding-bottom:28px; flex-shrink:0; }
+  .eyebrow{ display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px; font-weight:600; letter-spacing:.04em; color:var(--accent-deep); }
+  .eyebrow .dot{ width:5px; height:5px; border-radius:50%; background:var(--accent); }
+  .pagenum{ font-family:var(--mono); font-size:12px; color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+
+  .slide-body{ flex:1; min-height:0; display:flex; flex-direction:column; justify-content:center; gap:22px; }
+
+  h1.slide-title{ font-size:40px; line-height:1.22; font-weight:800; letter-spacing:-.01em; margin:0; text-wrap:balance; }
+  h1.slide-title .accent{ color:var(--accent); }
+  p.slide-lead{ font-size:18px; line-height:1.65; color:var(--ink-soft); margin:0; max-width:640px; }
+
+  .cover{ justify-content:space-between; }
+  .cover-top .eyebrow{ font-size:13px; }
+  .cover-mid{ display:flex; flex-direction:column; gap:18px; }
+  .cover-mid h1{ font-size:52px; line-height:1.18; font-weight:800; letter-spacing:-.015em; margin:0; text-wrap:balance; }
+  .cover-mid .sub{ font-size:19px; color:var(--ink-soft); max-width:620px; line-height:1.6; }
+  .cover-bottom{ display:flex; align-items:flex-end; justify-content:space-between; border-top:1px solid var(--line); padding-top:22px; }
+  .meta-list{ display:flex; gap:28px; font-size:13.5px; color:var(--ink-faint); }
+  .meta-list b{ color:var(--ink-soft); font-weight:600; }
+  .brandmark{ display:flex; align-items:center; gap:10px; }
+  .brandmark .sq-pair{ display:flex; gap:3px; flex-shrink:0; }
+  .brandmark .sq-pair img{ display:block; border-radius:7px; object-fit:contain; }
+  .brandmark .name{ font-weight:800; font-size:14.5px; }
+
+  .points{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+  .points li{ display:flex; gap:14px; align-items:flex-start; font-size:16.5px; line-height:1.65; color:var(--ink); }
+  .points li .num{ flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--accent-soft); color:var(--accent-deep); font-family:var(--mono); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-top:2px; }
+  .points li b{ font-weight:700; }
+  .points.tight li{ font-size:15.5px; }
+
+  .conclusion{ margin-top:6px; padding:16px 20px; background:var(--accent-soft); border-left:3px solid var(--accent); border-radius:0 12px 12px 0; font-size:15.5px; font-weight:600; color:var(--accent-deep); }
+
+  .two-col{ display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start; }
+  .col-card{ background:var(--surface-2); border:1px solid var(--line); border-radius:14px; padding:20px 22px; }
+  .col-card h3{ margin:0 0 10px; font-size:14.5px; font-weight:800; display:flex; align-items:center; gap:8px; }
+  .col-card h3 .bar{ width:3px; height:14px; background:var(--accent); border-radius:2px; }
+  .col-card p{ margin:0; font-size:14px; line-height:1.7; color:var(--ink-soft); }
+  .col-card ul{ margin:8px 0 0; padding:0 0 0 16px; }
+  .col-card li{ font-size:13.5px; line-height:1.7; color:var(--ink-soft); }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tag{ font-family:var(--mono); font-size:12px; font-weight:600; padding:6px 12px; border-radius:20px; background:var(--surface-2); border:1px solid var(--line); color:var(--ink-soft); }
+  .tag.accent{ background:var(--accent-soft); border-color:transparent; color:var(--accent-deep); }
+
+  /* mock stepper preview (echoes the real system's component) */
+  .mini-stepper{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .mini-stepper .node{ background:var(--surface); border:1px solid var(--line-strong); border-radius:9px; padding:9px 13px; font-size:12.5px; font-weight:700; color:var(--ink); }
+  .mini-stepper .node small{ display:block; font-size:10px; font-weight:600; color:var(--ink-faint); margin-top:2px; }
+  .mini-stepper .node.hl{ background:var(--accent-soft); border-color:var(--accent); color:var(--accent-deep); }
+  .mini-stepper .arrow{ color:var(--ink-faint); font-weight:700; font-size:13px; }
+
+  .jr-mini{ width:100%; border-collapse:collapse; font-size:13px; margin-top:12px; }
+  .jr-mini th,.jr-mini td{ padding:8px 12px; border-bottom:1px solid var(--line); text-align:center; }
+  .jr-mini th{ background:var(--surface-2); font-size:11.5px; color:var(--ink-faint); font-weight:700; }
+  .jr-mini td{ font-weight:600; font-variant-numeric:tabular-nums; }
+  .jr-mini tr:last-child td{ border-bottom:none; }
+
+  .status-row{ display:flex; gap:14px; }
+  .status-card{ flex:1; background:var(--surface-2); border:1px solid var(--line); border-radius:14px; padding:18px 20px; }
+  .status-card .pill{ display:inline-block; font-size:11px; font-weight:800; padding:4px 10px; border-radius:20px; margin-bottom:10px; }
+  .pill.done{ background:var(--green-soft); color:var(--green); }
+  .pill.progress{ background:var(--accent-soft); color:var(--accent-deep); }
+  .pill.todo{ background:var(--amber-soft); color:var(--amber); }
+  .status-card h4{ margin:0 0 6px; font-size:14.5px; font-weight:800; }
+  .status-card p{ margin:0; font-size:13px; line-height:1.6; color:var(--ink-soft); }
+
+  .roadmap{ display:flex; flex-direction:column; gap:0; }
+  .rm-row{ display:grid; grid-template-columns:64px 1fr; gap:18px; padding:14px 0; border-top:1px solid var(--line); }
+  .rm-row:first-child{ border-top:none; }
+  .rm-phase{ font-family:var(--mono); font-size:12px; font-weight:700; color:var(--accent); padding-top:2px; }
+  .rm-body b{ display:block; font-size:15.5px; font-weight:700; margin-bottom:3px; }
+  .rm-body span{ font-size:13.5px; color:var(--ink-soft); line-height:1.6; }
+
+  .closing{ align-items:center; justify-content:center; text-align:center; }
+  .closing .slide-body{ align-items:center; justify-content:center; }
+  .closing h1{ font-size:44px; }
+
+  /* nav */
+  .nav-btn{
+    position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+    width:44px; height:44px; border-radius:50%; border:1px solid var(--line-strong);
+    background:var(--surface); color:var(--ink-soft); font-size:17px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);
+    transition:background .12s, color .12s;
+  }
+  .nav-btn:hover{ background:var(--accent-soft); color:var(--accent-deep); }
+  .nav-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .nav-btn.prev{ left:-58px; }
+  .nav-btn.next{ right:-58px; }
+  .nav-btn:disabled{ opacity:.3; cursor:default; }
+  .nav-btn:disabled:hover{ background:var(--surface); color:var(--ink-soft); }
+
+  .progress{ position:absolute; left:50%; bottom:-30px; transform:translateX(-50%); display:flex; gap:6px; }
+  .progress button{ width:7px; height:7px; border-radius:50%; border:none; background:var(--line-strong); cursor:pointer; padding:0; }
+  .progress button.on{ background:var(--accent); width:20px; border-radius:4px; }
+  .progress button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  @media (max-width:880px){
+    .nav-btn.prev{ left:8px; } .nav-btn.next{ right:8px; }
+    .slide{ padding:40px 32px 48px; }
+    h1.slide-title{ font-size:30px; } .cover-mid h1{ font-size:34px; }
+    .two-col{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <div class="stage" id="stage">
+
+    <!-- 1. Cover -->
+    <section class="slide active cover">
+      <div class="cover-top"><span class="eyebrow"><span class="dot"></span>내부 보고 · Mockup 검토</span></div>
+      <div class="cover-mid">
+        <h1>회계·세무 통합 Wiki<br>구축 <span class="accent">경과 보고</span></h1>
+        <p class="sub">사업 라인별로 흩어져 있던 회계 처리 기준을, 누구나 같은 곳에서 찾아볼 수 있는 하나의 기준서로 — Mockup 완성 및 향후 계획 보고</p>
+      </div>
+      <div class="cover-bottom">
+        <div class="meta-list">
+          <div><b>작성</b> 재무관리부 회계팀 · 문동진</div>
+          <div><b>대상 시스템</b> 회계 · 세무 Wiki</div>
+          <div><b>일자</b> 2026-07-23</div>
+        </div>
+        <div class="brandmark">
+          <div class="sq-pair">
+            <img src="키다리 로고.png" alt="키다리스튜디오" width="30" height="30">
+            <img src="레진로고.png" alt="레진엔터테인먼트" width="30" height="30">
+          </div>
+          <span class="name">키다리스튜디오 · 레진엔터테인먼트</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Why -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>배경</span><span class="pagenum">02 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">왜 <span class="accent">지금</span> 필요한가</h1>
+        <ul class="points">
+          <li><span class="num">1</span><span>플랫폼·유통·영상·MD·레진스낵 등 사업 라인마다 회계 처리 기준이 <b>담당자 개인의 경험과 기억</b>에 의존하고 있습니다.</span></li>
+          <li><span class="num">2</span><span>신규 입사자·타 부서 이관 시마다 동일한 기준을 <b>구두로 반복 설명</b>해야 하고, 그 과정에서 누락·오류 리스크가 생깁니다.</span></li>
+          <li><span class="num">3</span><span>회계팀·세무팀이 서로 다른 자료를 참고하며, <b>같은 거래를 다르게 해석</b>하는 사례가 발견됩니다.</span></li>
+        </ul>
+        <div class="conclusion">결론 — 사업 라인 × 회계처리 단계를 축으로, 한 곳에서 찾아보는 표준 기준 문서가 필요합니다.</div>
+      </div>
+    </section>
+
+    <!-- 3. What we built -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>개요</span><span class="pagenum">03 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">무엇을 만들었나 — <span class="accent">회계·세무 통합 Wiki</span></h1>
+        <p class="slide-lead">회계팀과 세무팀의 기준을 한 시스템 안에, 사업 라인 기준과 조직 기준 두 가지 축으로 정리했습니다.</p>
+        <div class="two-col">
+          <div class="col-card">
+            <h3><span class="bar"></span>구성 축</h3>
+            <ul>
+              <li>상단 탭 — 회계(담당 문동진) / 세무(담당 이지윤)</li>
+              <li>유형별 보기 — 사업 라인 기준으로 탐색</li>
+              <li>팀별(조직도) 보기 — 담당 조직 기준으로 탐색</li>
+            </ul>
+          </div>
+          <div class="col-card">
+            <h3><span class="bar"></span>사업 라인 대분류</h3>
+            <div class="tag-row">
+              <span class="tag accent">플랫폼</span><span class="tag accent">유통</span><span class="tag">영상</span><span class="tag">MD</span><span class="tag">레진스낵</span><span class="tag">기타</span>
+            </div>
+            <p style="margin-top:10px">각 라인 하위에 매출구조 · MG · 정산 · 유의사항 탭을 동일한 틀로 배치했습니다.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Feature 1: process stepper -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>핵심 기능 1</span><span class="pagenum">04 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">매출 흐름을 <span class="accent">단계별로 클릭</span>해서 확인</h1>
+        <p class="slide-lead">코인 결제부터 회사 손익까지, 각 단계를 누르면 그 시점의 회계처리와 손익 변화가 함께 펼쳐집니다.</p>
+        <div class="mini-stepper">
+          <div class="node">코인 충전</div><span class="arrow">→</span>
+          <div class="node">콘텐츠 열람<small>매출 인식</small></div><span class="arrow">→</span>
+          <div class="node hl">PG 수수료 차감</div><span class="arrow">→</span>
+          <div class="node">CP 정산</div><span class="arrow">→</span>
+          <div class="node">자사 귀속 손익</div>
+        </div>
+        <p style="font-size:13.5px;color:var(--ink-faint);margin-top:2px">예시 — 플랫폼(자사) 매출구조 화면 중 일부</p>
+      </div>
+    </section>
+
+    <!-- 5. Feature 2: journal standardization -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>핵심 기능 2</span><span class="pagenum">05 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">차변·대변 <span class="accent">표기를 표준화</span></h1>
+        <p class="slide-lead">모든 회계처리를 동일한 표 형식으로 정리해, 어떤 사업 라인이든 같은 방식으로 읽을 수 있습니다.</p>
+        <table class="jr-mini">
+          <tr><th>차변</th><th>대변</th></tr>
+          <tr><td>선급비용-MG 2,400만원</td><td>미지급금-거래처 2,400만원</td></tr>
+          <tr><td>서비스매출원가 100만원</td><td>선급비용-MG 100만원</td></tr>
+        </table>
+        <p style="font-size:13.5px;color:var(--ink-faint)">예시 — MG(선급비용) 지급 및 상각 처리</p>
+      </div>
+    </section>
+
+    <!-- 6. Feature 3: S2 code link -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>핵심 기능 3</span><span class="pagenum">06 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">실제 <span class="accent">전산 분류코드</span>까지 연결</h1>
+        <p class="slide-lead">각 회계처리 밑에 실제 사용 중인 S2 분류코드·정산항목을 연결해, 필요할 때만 펼쳐볼 수 있게 했습니다. 본문은 간결하게, 상세는 클릭 한 번으로.</p>
+        <div class="two-col">
+          <div class="col-card">
+            <h3><span class="bar"></span>기본 화면</h3>
+            <p>회계처리 표와 설명만 노출 — 실무 판단에 필요한 최소 정보만 우선 제공</p>
+          </div>
+          <div class="col-card">
+            <h3><span class="bar"></span>펼쳤을 때</h3>
+            <p>분류코드명과 정산항목명을 함께 표기 — 전산 등록 시 그대로 참고 가능</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Content example: platform -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>콘텐츠 예시</span><span class="pagenum">07 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">플랫폼(자사) 매출구조</h1>
+        <ul class="points tight">
+          <li><span class="num">1</span><span><b>코인 = 부채</b> — K-IFRS 1115호 수익인식 기준에 따라, 코인 소진 시점에 발생주의로 매출 전환</span></li>
+          <li><span class="num">2</span><span><b>MG = 자산</b> — K-IFRS 1038호 무형자산 기준에 따라, 선급비용으로 계상 후 24개월 상각</span></li>
+          <li><span class="num">3</span><span><b>정산 기준</b> — RS(실적 정산액)와 MG를 비교해 추가 지급 여부를 판단(RS ≤ MG / RS &gt; MG)</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8. Content example: distribution -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>콘텐츠 예시</span><span class="pagenum">08 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">유통(B2B) 매출구조</h1>
+        <ul class="points tight">
+          <li><span class="num">1</span><span><b>완결작 vs 연재작</b> — 매출 인식 시점이 달라 각각 별도 기준으로 정리</span></li>
+          <li><span class="num">2</span><span><b>계열사 간 내부 정산</b> — 키다리·레진 명의 정산금 중 상대 법인 귀속분 처리 흐름</span></li>
+          <li><span class="num">3</span><span><b>제작비 처리</b> — MG(자산화·상각) vs 즉시 비용처리 대상을 구분 정리</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 9. Status -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>진행 현황</span><span class="pagenum">09 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">현재 <span class="accent">어디까지</span> 왔나</h1>
+        <div class="status-row">
+          <div class="status-card"><span class="pill done">완료</span><h4>화면 구조 · Mockup</h4><p>사이드바 · 탭 구조, 플랫폼 · 유통 콘텐츠, 클릭형 화면 설계 완성</p></div>
+          <div class="status-card"><span class="pill progress">진행 중</span><h4>콘텐츠 채우기</h4><p>영상 · MD · 레진스낵 · 기타 라인 및 세무 탭 상세 콘텐츠 작성</p></div>
+          <div class="status-card"><span class="pill todo">착수 전</span><h4>시스템 연동</h4><p>로그인 · 실데이터 · 검색은 Google Apps Script 연동 예정</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Roadmap -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>다음 단계</span><span class="pagenum">10 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">향후 계획</h1>
+        <div class="roadmap">
+          <div class="rm-row"><div class="rm-phase">STEP 1</div><div class="rm-body"><b>남은 사업 라인 콘텐츠 작성</b><span>영상 · MD · 레진스낵 · 기타 및 세무 탭 보강</span></div></div>
+          <div class="rm-row"><div class="rm-phase">STEP 2</div><div class="rm-body"><b>회계·세무팀 교차 검수</b><span>사업부 담당자 인터뷰 기반 내용 검증</span></div></div>
+          <div class="rm-row"><div class="rm-phase">STEP 3</div><div class="rm-body"><b>Google Apps Script 연동</b><span>로그인, 실데이터 연결, 검색 기능 구현</span></div></div>
+          <div class="rm-row"><div class="rm-phase">STEP 4</div><div class="rm-body"><b>사내 배포 및 운영</b><span>배포 범위 확정, 유지보수 담당 지정, 피드백 반영 체계 수립</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11. Ask -->
+    <section class="slide">
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>요청 사항</span><span class="pagenum">11 / 12</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title">검토 · 결정이 필요한 부분</h1>
+        <ul class="points">
+          <li><span class="num">1</span><span>콘텐츠 검수 — 사업부별 담당자 인터뷰 및 교차 검토 참여 승인</span></li>
+          <li><span class="num">2</span><span>배포 범위 — 전사 공개 여부, 열람 권한 정책 결정</span></li>
+          <li><span class="num">3</span><span>운영 체계 — 시스템 연동 이후 유지보수 담당 및 갱신 주기 지정</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 12. Closing -->
+    <section class="slide closing">
+      <div class="slide-body">
+        <span class="eyebrow" style="justify-content:center;margin-bottom:8px"><span class="dot"></span>감사합니다</span>
+        <h1 class="slide-title">질문 및 의견 부탁드립니다</h1>
+        <p class="slide-lead" style="margin:0 auto">재무관리부 회계팀 문동진 · 세무팀 이지윤</p>
+      </div>
+    </section>
+
+    <button class="nav-btn prev" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+    <button class="nav-btn next" id="nextBtn" aria-label="다음 슬라이드">›</button>
+    <div class="progress" id="progress"></div>
+  </div>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const progress = document.getElementById('progress');
+  let i = 0;
+
+  slides.forEach((_, idx) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', `슬라이드 ${idx+1}로 이동`);
+    b.addEventListener('click', () => go(idx));
+    progress.appendChild(b);
+  });
+  const dots = Array.from(progress.children);
+
+  function render(){
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    dots.forEach((d, idx) => d.classList.toggle('on', idx === i));
+    document.getElementById('prevBtn').disabled = i === 0;
+    document.getElementById('nextBtn').disabled = i === slides.length - 1;
+  }
+  function go(n){ i = Math.max(0, Math.min(slides.length - 1, n)); render(); }
+
+  document.getElementById('prevBtn').addEventListener('click', () => go(i-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(i+1));
+  window.addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowRight' || e.key === ' ') go(i+1);
+    if(e.key === 'ArrowLeft') go(i-1);
+  });
+
+  render();
+</script>
+</body>
+</html>

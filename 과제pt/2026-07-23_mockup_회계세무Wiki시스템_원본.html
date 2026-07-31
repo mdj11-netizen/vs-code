@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>회계/세무 Wiki — 목업</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.css">
 <style>
   :root{
     --blue:#3182F6; --blue-weak:#E8F3FF; --blue-deep:#1B64DA;
@@ -13,7 +14,7 @@
     --gray-1:#F2F4F6; --gray-05:#F9FAFB; --white:#fff;
     --radius:16px;
     --shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
-    --font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;
+    --font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--font);color:var(--ink);background:var(--gray-1);height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
@@ -23,16 +24,18 @@
   .topbar{height:60px;background:var(--white);border-bottom:1px solid var(--gray-2);display:flex;align-items:center;padding:0 24px;gap:18px;position:relative;z-index:10}
   .brand{display:flex;align-items:center;gap:12px;min-width:210px}
   .brand-logo{width:34px;height:34px;border-radius:9px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:17px;transition:.2s}
-  .brand-name{font-weight:800;font-size:16px;letter-spacing:-.3px}
-  .brand-sub{font-size:11px;color:var(--gray-5);font-weight:600;margin-top:1px}
+  .brand-logo-pair{display:flex;gap:4px;flex-shrink:0}
+  .brand-logo-pair img{display:block;border-radius:9px;object-fit:contain}
+  .brand-name{font-weight:800;font-size:18px;letter-spacing:-.3px}
+  .brand-sub{font-size:12.5px;color:var(--gray-5);font-weight:600;margin-top:1px}
   .company-switch{margin-left:2px;display:flex;background:var(--gray-1);border-radius:8px;padding:3px}
   .company-switch button{font-size:12px;font-weight:700;color:var(--gray-6);padding:5px 11px;border-radius:6px;transition:.15s}
   .company-switch button.on{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
   .topbar-tabs{display:flex;gap:4px;margin-left:6px}
-  .tab{font-size:15px;font-weight:700;color:var(--gray-5);padding:8px 18px;border-radius:10px;transition:.15s}
+  .tab{font-size:17px;font-weight:700;color:var(--gray-5);padding:8px 18px;border-radius:10px;transition:.15s}
   .tab.on{color:var(--blue);background:var(--blue-weak)}
-  .tab .owner{display:block;font-size:10px;font-weight:600;color:var(--gray-4);margin-top:1px}
+  .tab .owner{display:block;font-size:11.5px;font-weight:600;color:var(--gray-4);margin-top:1px}
   .tab.on .owner{color:var(--blue-deep);opacity:.75}
 
   .topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
@@ -50,119 +53,196 @@
   /* ===== 좌측 사이드바 ===== */
   .sidebar{width:292px;background:var(--white);border-right:1px solid var(--gray-2);display:flex;flex-direction:column;flex-shrink:0}
   .side-head{padding:18px 20px 10px}
-  .side-title{font-size:13px;font-weight:800;color:var(--gray-6);letter-spacing:.2px;margin-bottom:12px}
+  .side-title{font-size:15px;font-weight:800;color:var(--gray-6);letter-spacing:.2px;margin-bottom:12px}
   .view-switch{display:flex;background:var(--gray-1);border-radius:10px;padding:3px}
-  .view-switch button{flex:1;font-size:12.5px;font-weight:700;color:var(--gray-6);padding:8px 0;border-radius:7px;transition:.15s}
+  .view-switch button{flex:1;font-size:14px;font-weight:700;color:var(--gray-6);padding:8px 0;border-radius:7px;transition:.15s}
   .view-switch button.on{background:var(--white);color:var(--blue);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
   .tree{flex:1;overflow-y:auto;padding:6px 12px 24px}
   .tree::-webkit-scrollbar{width:8px}.tree::-webkit-scrollbar-thumb{background:var(--gray-3);border-radius:8px}
 
   .cat{margin-bottom:2px}
-  .cat-head{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;font-weight:700;font-size:14px;color:var(--gray-9);transition:.12s;width:100%;text-align:left}
+  .cat-head{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:10px;font-weight:700;font-size:16px;color:var(--gray-9);transition:.12s;width:100%;text-align:left}
   .cat-head:hover{background:var(--gray-05)}
-  .cat-emoji{font-size:15px;width:18px;text-align:center}
+  .cat-emoji{font-size:17px;width:18px;text-align:center}
   .cat-arrow{margin-left:auto;color:var(--gray-4);font-size:11px;transition:.2s}
   .cat.open .cat-arrow{transform:rotate(90deg)}
   .cat-items{display:none;padding:2px 0 6px 22px;margin-left:8px;border-left:1.5px solid var(--gray-2)}
   .cat.open .cat-items{display:block}
-  .leaf{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:13px;color:var(--gray-7);font-weight:500;transition:.12s;width:100%;text-align:left}
+  .leaf{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:14.5px;color:var(--gray-7);font-weight:500;transition:.12s;width:100%;text-align:left}
   .leaf:hover{background:var(--gray-05);color:var(--gray-9)}
   .leaf.on{background:var(--blue-weak);color:var(--blue-deep);font-weight:700}
   .leaf .dot{width:5px;height:5px;border-radius:50%;background:var(--gray-4);flex-shrink:0}
   .leaf.on .dot{background:var(--blue)}
 
   .side-divider{margin:14px 20px 10px;border-top:1px solid var(--gray-2)}
-  .common-label{padding:0 20px 6px;font-size:11px;font-weight:800;color:var(--gray-5);letter-spacing:.3px}
+  .common-label{padding:0 20px 6px;font-size:12.5px;font-weight:800;color:var(--gray-5);letter-spacing:.3px}
   .placeholder-note{margin:2px 12px 8px;font-size:11px;color:var(--gray-5);background:#FFF9EB;border:1px solid #FFE9AE;border-radius:8px;padding:8px 10px;line-height:1.5}
 
   /* ===== 우측 컨텐츠 ===== */
   .content{flex:1;overflow-y:auto;padding:32px 40px 60px}
   .content::-webkit-scrollbar{width:10px}.content::-webkit-scrollbar-thumb{background:var(--gray-3);border-radius:8px}
-  .crumb{font-size:12px;color:var(--gray-5);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .crumb{font-size:12.5px;color:var(--gray-5);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .crumb .sep{color:var(--gray-3)}
   .doc-title{font-size:26px;font-weight:800;letter-spacing:-.6px;margin-bottom:8px}
   .doc-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
-  .chip{font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;background:var(--gray-1);color:var(--gray-6)}
+  .chip{font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:20px;background:var(--gray-1);color:var(--gray-6)}
   .chip.blue{background:var(--blue-weak);color:var(--blue-deep)}
   .chip.green{background:#E7F7EF;color:#0F9D58}
   .chip.red{background:#FDECEC;color:#E03E3E}
   .chip.amber{background:#FFF4DE;color:#B7791F}
 
-  .card{background:var(--white);border:1px solid var(--gray-2);border-radius:var(--radius);padding:26px 28px;margin-bottom:18px;box-shadow:var(--shadow)}
-  .card h3{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px}
-  .card h3 .bar{width:4px;height:16px;background:var(--blue);border-radius:3px}
+  .card{position:relative;overflow:hidden;background:var(--white);border:1px solid var(--gray-2);border-radius:var(--radius);padding:30px 32px;margin-bottom:24px;box-shadow:var(--shadow)}
+  .card h3{font-size:18px;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  .card h3 .bar{width:4px;height:19px;background:var(--blue);border-radius:3px}
   .card h3 .bar.warn{background:#F0B429}
-  .card p{font-size:14px;line-height:1.8;color:var(--gray-7)}
-  .card p + p{margin-top:10px}
+  .card p{font-size:14.5px;line-height:1.75;color:var(--gray-7)}
+  .card p + p{margin-top:11px}
   .card strong{color:var(--ink);font-weight:700}
   .card ul{margin:8px 0 0 2px;padding:0;list-style:none}
-  .card li{font-size:13.5px;line-height:1.75;color:var(--gray-7);padding-left:18px;position:relative}
+  .card li{font-size:14px;line-height:1.7;color:var(--gray-7);padding-left:18px;position:relative}
   .card li::before{content:'';position:absolute;left:3px;top:10px;width:5px;height:5px;border-radius:50%;background:var(--blue)}
   .card li+li{margin-top:6px}
   .section-gap{margin-top:18px}
 
-  /* ---- 프로세스 흐름도(클릭형) ---- */
+  /* ---- 카드 아코디언(제목 클릭 시 펼쳐짐, 기본은 닫힘) ---- */
+  .card > summary{cursor:pointer;list-style:none;font-size:18px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:0}
+  .card > summary::-webkit-details-marker{display:none}
+  .card > summary .fold-caret{margin-left:auto;font-size:13px;color:var(--gray-4);transition:transform .15s}
+  .card[open] > summary{margin-bottom:18px}
+  .card[open] > summary .fold-caret{transform:rotate(180deg)}
+
+  /* ---- 섹션 구분 라벨(제작비: MG vs 즉시비용처리) ---- */
+  .section-block{margin-top:26px;padding-top:20px;border-top:2px solid var(--gray-3)}
+  .section-block:first-of-type{margin-top:16px}
+  .section-title{display:inline-block;font-size:15px;font-weight:800;padding:6px 16px;border-radius:8px;margin-bottom:16px}
+  .section-title.blue{background:var(--blue-weak);color:var(--blue-deep)}
+  .section-title.amber{background:#FFF4DE;color:#B7791F}
+
+  /* ---- 프로세스 흐름도(정적, 세무 문서용) ---- */
   .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:4px 0}
-  .flow .step{background:var(--gray-05);border:1px solid var(--gray-2);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:700;color:var(--gray-9);line-height:1.5;cursor:pointer;transition:.15s}
-  .flow .step small{display:block;font-size:11px;font-weight:600;color:var(--gray-5);margin-top:2px}
-  .flow .step:hover{border-color:#cfe3ff;color:var(--blue-deep)}
+  .flow .step{background:var(--gray-05);border:1px solid var(--gray-2);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;color:var(--gray-9)}
   .flow .arrow{color:var(--gray-4);font-weight:800}
   .flow .step.hl{background:var(--blue-weak);border-color:#cfe3ff;color:var(--blue-deep)}
-  .flow .step.hl small{color:var(--blue-deep);opacity:.75}
-  .flow-hint{font-size:11.5px;color:var(--gray-5);margin:8px 0 0}
-  .flow-detail{display:none;margin-top:10px;background:var(--gray-05);border:1px solid var(--gray-2);border-radius:10px;padding:14px 16px}
+
+  /* ---- 정보 위계: 핵심 원칙 / 예시 ---- */
+  .principle{font-size:16px;font-weight:800;color:var(--ink);line-height:1.6;margin-bottom:8px}
+  .example-quote{margin-top:18px;padding:13px 17px;background:var(--gray-05);border-radius:8px;font-size:13.5px;color:var(--gray-6);font-style:italic;line-height:1.7}
+
+  /* ---- 예시 손익 분해(세로) ---- */
+  .example-breakdown{margin-top:18px;padding:16px 20px;background:var(--gray-05);border-radius:8px;font-size:13.5px;color:var(--gray-7)}
+  .example-breakdown .eb-head{font-weight:700;color:var(--gray-9);margin-bottom:8px;padding:4px 8px;margin-left:-8px;margin-right:-8px;border-radius:6px;transition:background .15s,color .15s}
+  .example-breakdown .eb-line{display:flex;gap:8px;padding:4px 8px;margin:0 -8px;border-radius:6px;transition:background .15s}
+  .example-breakdown .eb-line .amt{font-weight:700;font-variant-numeric:tabular-nums}
+  .example-breakdown .eb-line .note{color:var(--gray-5);font-weight:400}
+  .example-breakdown .eb-line.plus .amt{color:#0F9D58}
+  .example-breakdown .eb-line.minus .amt{color:#E03E3E}
+  .example-breakdown .eb-line.total{margin-top:6px;padding-top:10px;border-top:1px solid var(--gray-2);font-weight:800;color:var(--ink)}
+  .example-breakdown .eb-line.total .amt{color:var(--blue-deep)}
+  .example-breakdown [data-eb].active{background:var(--blue-weak)}
+  .example-breakdown .eb-head.active{color:var(--blue-deep)}
+
+  /* ---- 프로세스 스테퍼(클릭형, 박스) ---- */
+  .stepper{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+  .stepper .node{width:auto;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;white-space:nowrap;border-radius:10px;padding:8px 16px;font-size:15.5px;font-weight:700;line-height:1.4;cursor:pointer;transition:.15s;background:var(--white);border:1px solid var(--gray-2);color:var(--gray-9)}
+  .stepper .node small{display:block;font-size:12.5px;font-weight:600;color:var(--gray-5);margin-top:3px}
+  .stepper .node:hover{border-color:#cfe3ff}
+  .stepper .arrow{align-self:center;color:var(--gray-4);font-weight:800}
+  .stepper .node.hl{background:var(--blue-weak);border-color:#cfe3ff;color:var(--blue-deep)}
+  .stepper .node.hl small{color:var(--blue-deep);opacity:.75}
+  .flow-detail{display:none;margin-top:16px;background:var(--gray-05);border-left:3px solid var(--blue);border-radius:0 8px 8px 0;padding:14px 18px}
   .flow-detail.show{display:block}
-  .flow-detail .t{display:block;font-size:13px;font-weight:800;color:var(--blue-deep);margin-bottom:5px}
-  .flow-detail p{font-size:13px;color:var(--gray-7);line-height:1.65;margin:0}
+  .flow-detail p{font-size:13.5px;font-weight:500;color:var(--gray-9);line-height:1.7;margin:0}
+  .flow-detail p+p{margin-top:8px}
 
   /* ---- 번호형 단계 리스트 ---- */
-  .steps{list-style:none;margin:12px 0 0;padding:0}
-  .steps li{display:flex;gap:13px;padding:12px 0}
+  .steps{list-style:none;margin:14px 0 0;padding:0}
+  .steps li{display:flex;gap:13px;padding:13px 0}
   .steps li+li{border-top:1px solid var(--gray-1)}
-  .steps .num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:var(--blue-weak);color:var(--blue-deep);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .steps .num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--blue-weak);color:var(--blue-deep);font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
   .steps .step-body{flex:1}
-  .steps .step-body strong{display:block;font-size:13.5px;color:var(--ink);margin-bottom:3px}
-  .steps .step-body p{font-size:13px;color:var(--gray-7);line-height:1.7;margin:0}
+  .steps .step-body strong{display:block;font-size:15.5px;color:var(--ink);margin-bottom:3px}
+  .steps .step-body p{font-size:13.5px;color:var(--gray-7);line-height:1.65;margin:0}
 
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--gray-2);vertical-align:top}
-  th{font-size:12px;font-weight:800;color:var(--gray-6);background:var(--gray-05)}
+  table{width:auto;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:center;padding:12px 15px;vertical-align:middle;border-bottom:1px solid var(--gray-3)}
+  tr:last-child td{border-bottom:none}
+  th{font-size:13.5px;font-weight:800;color:var(--gray-6);background:var(--gray-05)}
   td{color:var(--gray-7);line-height:1.6}
   td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:var(--gray-9)}
-  tr:last-child td{border-bottom:none}
   tr.total td{background:var(--blue-weak);font-weight:800;color:var(--blue-deep)}
-  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+  .tag{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:6px}
   .tag.g{background:#E7F7EF;color:#0F9D58}.tag.r{background:#FDECEC;color:#E03E3E}.tag.a{background:#FFF4DE;color:#B7791F}.tag.b{background:var(--blue-weak);color:var(--blue-deep)}
 
   /* ---- 콜아웃(이모지 없이 라벨+컬러바) ---- */
   .callout{background:#FFF9EB;border:1px solid #FFE9AE;border-left:3px solid #F0B429;border-radius:10px;padding:13px 16px 14px;margin-top:14px}
   .callout.blue{background:var(--blue-weak);border-color:#cfe3ff;border-left-color:var(--blue)}
-  .callout-label{display:block;font-size:11px;font-weight:800;letter-spacing:.2px;color:#B7791F;margin-bottom:5px}
+  .callout-label{display:block;font-size:12.5px;font-weight:800;letter-spacing:.2px;color:#B7791F;margin-bottom:5px}
   .callout.blue .callout-label{color:var(--blue-deep)}
-  .callout p{font-size:13px;line-height:1.7;color:#8A6D1B;margin:0}
+  .callout p{font-size:14.5px;line-height:1.7;color:#8A6D1B;margin:0}
   .callout.blue p{color:var(--blue-deep)}
   .callout strong{color:#6b530f}.callout.blue strong{color:var(--blue-deep)}
 
   /* ---- 유의사항 카드형 리스트 ---- */
   .warn-list{display:flex;flex-direction:column;gap:11px;margin-top:12px}
   .warn-item{background:#FFFBF0;border:1px solid #FFE9AE;border-left:3px solid #F0B429;border-radius:10px;padding:13px 16px}
-  .warn-item strong{display:block;font-size:13.5px;color:#8A6D1B;margin-bottom:4px}
-  .warn-item p{font-size:13px;color:#6b5720;line-height:1.7;margin:0}
+  .warn-item strong{display:block;font-size:15.5px;color:#8A6D1B;margin-bottom:4px}
+  .warn-item p{font-size:14.5px;color:#6b5720;line-height:1.7;margin:0}
+
+  /* ---- 나란히 비교 (2열) ---- */
+  .dual{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:12px;align-items:start}
+  .dual>div{min-width:0}
 
   /* ---- 조건 비교 카드 ---- */
   .compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
   .compare .cond{border-radius:10px;padding:15px 17px;border:1px solid var(--gray-2)}
   .compare .cond.a{background:var(--gray-05)}
   .compare .cond.b{background:var(--blue-weak);border-color:#cfe3ff}
-  .compare .cond .rule{font-size:13.5px;font-weight:800;margin-bottom:7px}
+  .compare .cond .rule{font-size:15.5px;font-weight:800;margin-bottom:7px}
   .compare .cond.a .rule{color:var(--gray-7)}
   .compare .cond.b .rule{color:var(--blue-deep)}
-  .compare .cond p{font-size:12.5px;color:var(--gray-6);line-height:1.65;margin:0}
+  .compare .cond p{font-size:13px;color:var(--gray-6);line-height:1.6;margin:0}
 
   .kv{display:grid;grid-template-columns:150px 1fr;gap:11px 16px;font-size:13.5px}
   .kv .k{color:var(--gray-5);font-weight:700}
   .kv .v{color:var(--gray-9);font-weight:500;line-height:1.6}
+
+  /* ---- 카드 내 소제목 ---- */
+  .subhead{font-size:15.5px;font-weight:800;color:var(--ink);margin:22px 0 9px}
+  .subhead:first-child{margin-top:0}
+  .subhead small{display:block;font-size:12.5px;font-weight:600;color:var(--gray-5);margin-top:4px}
+
+  /* ---- 분개(차변/대변) 표 & 토글 ---- */
+  .jr-table{width:auto;margin-top:10px;font-size:13.5px}
+  .jr-table th,.jr-table td{white-space:nowrap;text-align:center}
+  .jr-table th{background:var(--gray-2)}
+  .jr-table td{color:var(--ink);font-weight:400;background:var(--white)}
+  .jr-code{margin-top:8px;font-size:13px;color:var(--gray-5);font-weight:600}
+  .jr-toggle{margin-top:16px}
+  .jr-toggle summary{cursor:pointer;font-size:13px;font-weight:700;color:var(--blue-deep);list-style:none;display:inline-flex;align-items:center;gap:5px;user-select:none}
+  .jr-toggle summary::-webkit-details-marker{display:none}
+  .jr-toggle summary::before{content:'▶';font-size:9px;color:var(--gray-4);transition:.15s}
+  .jr-toggle[open] summary::before{transform:rotate(90deg)}
+  .jr-toggle summary:hover{color:var(--blue)}
+  .jr-toggle .jr-table,.jr-toggle .s2-table{margin-top:10px}
+  .s2-table{width:100%;table-layout:fixed}
+  .s2-table th{background:var(--blue-weak);color:var(--blue-deep);text-align:left}
+  .s2-table th:first-child,.s2-table td:first-child{width:120px}
+  .s2-table td{font-size:13px;color:var(--gray-6);line-height:1.55;text-align:left}
+  .jr-label{font-size:13px;font-weight:700;color:var(--gray-6);margin:12px 0 5px}
+  .jr-label:first-child{margin-top:0}
+
+  /* ---- 분류코드 패널 (카드 내부에서 슬라이드) ---- */
+  .s2-link{margin-top:16px;padding:0;font-size:13px;font-weight:700;color:var(--blue-deep);display:inline-flex;align-items:center;gap:5px}
+  .s2-link::before{content:'▶';font-size:9px;color:var(--gray-4)}
+  .s2-link:hover{color:var(--blue)}
+  .s2-drawer{position:absolute;top:0;right:0;height:100%;width:62%;max-width:460px;min-width:280px;background:var(--white);border-left:1px solid var(--gray-2);box-shadow:-10px 0 20px rgba(0,0,0,.08);z-index:5;transform:translateX(100%);transition:transform .2s ease;display:flex;flex-direction:column;min-height:0}
+  .s2-drawer.show{transform:translateX(0)}
+  .s2-drawer-head{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--gray-2);font-size:15.5px;font-weight:800;color:var(--ink);flex-shrink:0}
+  .s2-drawer-head button{font-size:15px;color:var(--gray-6);padding:5px 8px;border-radius:8px;flex-shrink:0}
+  .s2-drawer-head button:hover{background:var(--gray-05);color:var(--gray-9)}
+  .s2-drawer-body{flex:1;min-height:0;overflow-y:auto;scrollbar-gutter:stable;padding:0 20px 16px}
+  .s2-drawer-body .s2-table th,.s2-drawer-body .s2-table td{white-space:normal;word-break:break-word}
 
   .check li::before{content:'✓';background:none;color:var(--blue);font-weight:800;font-size:13px;top:2px;left:0}
   .check li{padding-left:22px}
@@ -175,7 +255,10 @@
 <!-- ===== 상단 헤더 ===== -->
 <header class="topbar">
   <div class="brand">
-    <div class="brand-logo" id="logo">K</div>
+    <div class="brand-logo-pair" id="logo">
+      <img src="키다리 로고.png" alt="키다리스튜디오" width="34" height="34">
+      <img src="레진로고.png" alt="레진엔터테인먼트" width="34" height="34">
+    </div>
     <div>
       <div class="brand-name" id="companyName">키다리/레진</div>
       <div class="brand-sub">회계/세무 Wiki</div>
@@ -222,6 +305,16 @@
 
 <div class="mock-note">🎨 목업(Mockup) · 로그인·데이터는 Google Apps Script 연동 예정</div>
 
+<div id="s2Home" hidden>
+  <aside class="s2-drawer" id="s2Drawer">
+    <div class="s2-drawer-head">
+      <button onclick="closeS2()">»</button>
+      <span>S2 분류코드 · 정산항목</span>
+    </div>
+    <div class="s2-drawer-body" id="s2DrawerBody"></div>
+  </aside>
+</div>
+
 <script>
 /* ================= 트리 정의 =================
  * key = tab + '|' + view  (acc|type, acc|team, tax|type, tax|team) */
@@ -237,12 +330,12 @@ const COMMON_TAX = [
 ];
 
 const CATS_BIZ = [
-  {id:'platform', name:'플랫폼',   emoji:'📱'},
-  {id:'dist',     name:'유통',     emoji:'📦'},
-  {id:'video',    name:'영상',     emoji:'🎬'},
-  {id:'md',       name:'MD',       emoji:'🛍️'},
-  {id:'snack',    name:'레진스낵', emoji:'🍿'},
-  {id:'etc',      name:'기타',     emoji:'🗂️'},
+  {id:'platform', name:'플랫폼',   emoji:'📱', leaves:['매출구조','MG','정산','유의사항']},
+  {id:'dist',     name:'유통',     emoji:'📦', leaves:['매출구조','국내유통','해외유통','해외출판','유의사항']},
+  {id:'video',    name:'영상',     emoji:'🎬', leaves:['매출구조','MG','정산','유의사항']},
+  {id:'md',       name:'MD',       emoji:'🛍️', leaves:['매출구조','MG','정산','유의사항']},
+  {id:'snack',    name:'레진스낵', emoji:'🍿', leaves:['매출구조','MG','정산','유의사항']},
+  {id:'etc',      name:'기타',     emoji:'🗂️', leaves:['매출구조','MG','정산','유의사항']},
 ];
 const TEAMS = [
   {id:'plan',     name:'기획제작팀',  emoji:'✏️'},
@@ -255,7 +348,7 @@ const TEAMS = [
 const TREES = {
   'acc|type': {
     note:null,
-    groups: CATS_BIZ.map(c=>({...c, leaves:['매출구조','MG','정산','유의사항']})),
+    groups: CATS_BIZ,
     common: COMMON_ACC
   },
   'acc|team': {
@@ -284,83 +377,211 @@ const TREES = {
 const DOCS = {
   /* ---------- 회계: 유형별 ---------- */
   'platform/매출구조': {
-    title:'플랫폼 — 매출구조', crumb:['회계','플랫폼','매출구조'], chips:[['blue','매출인식']],
+    title:'플랫폼 — 매출구조', crumb:['회계','플랫폼','매출구조'], chips:[['blue','코인'],['','K-IFRS 1115호']],
     body:`
-      <div class="card"><h3><span class="bar"></span>매출 인식의 핵심 원칙</h3>
-        <p>유저가 결제(충전)한 시점에는 아직 서비스(웹툰/웹소설 열람)를 제공한 것이 아니므로 <strong>회사의 진짜 매출이 아니다</strong>. 유저가 코인을 소진하여 작품을 읽는 시점에 발생주의 원칙에 따라 매출로 전환한다.</p>
-        <div class="flow" id="flow-maechul">
-          <button class="step" onclick="showStep(this,'maechul','charge')">코인 충전</button>
+      <div class="card"><h3><span class="bar"></span>코인</h3>
+        <p class="principle">유저가 코인을 소진하여 작품을 읽는 시점에 발생주의 원칙에 따라 매출로 전환한다.</p>
+        <p>유저가 결제(충전)한 시점에는 아직 서비스(웹툰/웹소설 열람)를 제공한 것이 아니므로 <strong>회사의 진짜 매출이 아니다.</strong></p>
+        <div class="stepper" id="flow-maechul">
+          <button class="node" onclick="showStep(this,'maechul','charge')">코인 충전</button>
           <span class="arrow">→</span>
-          <button class="step" onclick="showStep(this,'maechul','read')">콘텐츠 열람(소진)</button>
+          <button class="node" onclick="showStep(this,'maechul','recognize')">콘텐츠 열람</button>
           <span class="arrow">→</span>
-          <button class="step" onclick="showStep(this,'maechul','recognize')">매출 인식</button>
+          <button class="node" onclick="showStep(this,'maechul','pgfee')">PG 수수료 차감</button>
           <span class="arrow">→</span>
-          <button class="step" onclick="showStep(this,'maechul','settle')">CP 정산</button>
+          <button class="node" onclick="showStep(this,'maechul','settle')">CP 정산</button>
+          <span class="arrow">→</span>
+          <button class="node" onclick="showStep(this,'maechul','profit')">자사 귀속 손익</button>
         </div>
-        <p class="flow-hint">박스를 클릭하면 각 단계의 상세 처리 내용을 볼 수 있습니다.</p>
         <div class="flow-detail" id="flow-detail-maechul"></div>
-      </div>
-      <div class="card"><h3><span class="bar"></span>기타 처리 기준</h3>
-        <ul>
-          <li><strong>미사용 코인(낙구)</strong> — 소멸시효가 지나거나 미사용한 코인은 추후 <span class="tag b">매출</span>로 반영.</li>
-          <li><strong>PG사 검증 · 수수료</strong> — PG사 입금액과 유저 코인 충전액 간 차액 발생 시 검증을 거쳐 <span class="tag r">지급수수료(비용)</span> 계정으로 처리.</li>
-        </ul>
-      </div>
-      <div class="card"><h3><span class="bar warn"></span>확인 필요 사항</h3>
-        <ul>
-          <li>봄툰·레진은 B2B거래. 유통..?</li>
-          <li>봄툰은 전자출판물 — 면세. TH·TW는 영세</li>
-          <li>거래별로 어떤 계정 사용하는지</li>
-        </ul>
-        <div class="callout"><span class="callout-label">확인 필요</span><p>위 항목은 <strong>확인이 필요한 메모</strong>입니다 — 회계팀 검토 후 확정 내용으로 대체 예정.</p></div>
+        <div class="example-breakdown" id="eb-maechul">
+          <div class="eb-head" data-eb="charge">코인 1,000 충전 →</div>
+          <div class="eb-line plus" data-eb="recognize"><span class="amt">+ 800</span><span class="note">매출 인식: 코인 800원 소진</span></div>
+          <div class="eb-line minus" data-eb="pgfee"><span class="amt">− 100</span><span class="note">PG 수수료</span></div>
+          <div class="eb-line minus" data-eb="settle"><span class="amt">− 300</span><span class="note">CP 정산</span></div>
+          <div class="eb-line total" data-eb="profit"><span class="amt">= 400</span> 이익</div>
+        </div>
       </div>`
   },
   'platform/MG': {
-    title:'플랫폼 — MG', crumb:['회계','플랫폼','MG'], chips:[['blue','선급비용'],['amber','상각']],
+    title:'플랫폼 — MG', crumb:['회계','플랫폼','MG'], chips:[['blue','MG = 자산'],['','K-IFRS 1038호']],
     body:`
-      <div class="card"><h3><span class="bar"></span>MG(Minimum Guarantee)란?</h3>
-        <p>작품 계약 시 작가/CP에게 "최소 이만큼의 수익은 보장하겠다"고 미리 지급하는 선급 정산금이다. 회계상으로는 지급 즉시 비용으로 털지 않고 <strong>자산으로 잡아둔 뒤</strong>, 작품 오픈 후 나눠서 원가로 반영한다.</p>
-      </div>
-      <div class="card"><h3><span class="bar"></span>RS(Revenue Share, 실적 정산액)란?</h3>
-        <p>유저가 실제로 결제·소진한 금액 기준으로, 계약된 비율만큼 작가·CP에게 지급되는 실제 금액. "실적에 따라 실제로 나가는 돈"이라고 보면 된다.</p>
-        <div class="flow" id="flow-mg">
-          <button class="step" onclick="showStep(this,'mg','contract')">계약&middot;MG 지급<small>자산 계상</small></button>
+      <div class="card"><h3><span class="bar"></span>MG = 자산</h3>
+        <p><span class="tag b">근거 · K-IFRS 1038호 무형자산</span></p>
+        <p class="principle">작가에게 미리 준 거액의 MG를 지급 당월에 한 번에 비용 처리하지 않고, 작품 연재·매출 발생 기간(24개월) 동안 매달 나누어 원가로 반영한다 (손익 매칭).</p>
+        <div class="stepper" id="flow-mg">
+          <button class="node" onclick="showStep(this,'mg','contract')">계약·MG 지급</button>
           <span class="arrow">→</span>
-          <button class="step" onclick="showStep(this,'mg','launch')">작품 론칭(Open)<small>원가 전환 시작</small></button>
+          <button class="node" onclick="showStep(this,'mg','launch')">작품 론칭(Open)</button>
           <span class="arrow">→</span>
-          <button class="step" onclick="showStep(this,'mg','service')">서비스 24개월간<small>매출원가 반영</small></button>
+          <button class="node" onclick="showStep(this,'mg','service')">서비스 24개월간</button>
         </div>
-        <p class="flow-hint">박스를 클릭하면 각 단계의 상세 처리 내용을 볼 수 있습니다.</p>
         <div class="flow-detail" id="flow-detail-mg"></div>
       </div>
-      <div class="card"><h3><span class="bar"></span>MG 구분 및 처리 기준</h3>
-        <ol class="steps">
-          <li><span class="num">1</span><div class="step-body"><strong>일반 MG</strong><p>선급비용 처리 후 론칭되는 시점부터 24개월 균등 상각</p></div></li>
-          <li><span class="num">2</span><div class="step-body"><strong>단발성 계약금</strong><p>지급시점에 즉시 원가 처리</p></div></li>
-          <li><span class="num">3</span><div class="step-body"><strong>해외 플랫폼 특이사항</strong><p>해외 건의 경우 국가별 부가가치세(VAT) 상충 및 환율 이슈로 MG 계정을 최소화</p></div></li>
-        </ol>
+      <div class="card"><h3><span class="bar"></span>해외 플랫폼 특이사항</h3>
+        <p>해외 건의 경우 국가별 부가가치세(VAT) 상충 및 환율 이슈로 MG 계약을 최소화한다.</p>
+        <div class="callout blue"><span class="callout-label">참고</span><p>국내매출 — 면세<br>해외매출 — 과세. 상세 기준은 세무 Wiki 참고.</p></div>
       </div>`
   },
   'platform/정산': {
-    title:'플랫폼 — 정산', crumb:['회계','플랫폼','정산'], chips:[['blue','MG상계']],
+    title:'플랫폼 — 정산(MG 계약의 경우)', crumb:['회계','플랫폼','정산'], chips:[['blue','MG상계']],
     body:`
       <div class="card"><h3><span class="bar"></span>정산 원칙</h3>
-        <p>유저 소진으로 쌓인 RS(수익배분액)가 기지급된 MG를 초과하는 시점부터 <strong>실제 현금 정산금이 지급</strong>된다.</p>
-        <div class="compare">
-          <div class="cond a"><div class="rule">RS 금액 ≤ MG</div><p>별도 현금 지급 없음 (MG 차감)</p></div>
-          <div class="cond b"><div class="rule">RS 금액 &gt; MG</div><p>MG 상각 완료 후 초과된 RS 금액을 정산 지급</p></div>
+        <div class="dual">
+          <div>
+            <div class="subhead">RS ≤ MG<small>예) RS 70만원 &lt; MG 100만원</small></div>
+            <p>정해진 월 상각액 100만원을 원가로 반영하고 선급비용을 차감한다 (추가 현금 지급 없음).</p>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가 100만원</td><td>선급비용-MG 100만원</td></tr></table>
+            <div class="jr-label">CP 현금 지급 시</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금-거래처 100만원</td><td>보통예금 100만원</td></tr></table>
+          </div>
+          <div>
+            <div class="subhead">RS &gt; MG<small>예) RS 150만원 &gt; MG 100만원</small></div>
+            <p>월 상각액 100만원을 원가로 반영하여 선급비용을 차감하고, 초과분 50만원은 추가 정산(미지급금)한다.</p>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가 150만원</td><td>선급비용-MG 100만원</td></tr><tr><td></td><td>미지급금-거래처 50만원</td></tr></table>
+            <div class="jr-label">CP 현금 지급 시</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금-거래처 150만원</td><td>보통예금 150만원</td></tr></table>
+          </div>
         </div>
+
+        <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>정산 대금 지급</td><td>거래처대금지급(소설)<br>거래처대금지급(웹툰)</td></tr><tr><td>정산대금추가지급</td><td>RS_추가지급_원화_소설(개인)<br>RS_추가지급_원화_소설(사업자)</td></tr></table></div>
       </div>`
   },
-  'platform/유의사항': {
-    title:'플랫폼 — 유의사항', crumb:['회계','플랫폼','유의사항'], chips:[['amber','필독']],
+
+  /* ---------- 회계: 유통 ---------- */
+  'dist/매출구조': {
+    title:'유통 — 매출구조', crumb:['회계','유통','매출구조'], chips:[['blue','매출인식'],['','타사유통 B2B']],
     body:`
-      <div class="card"><h3><span class="bar warn"></span>유의사항</h3>
-        <div class="warn-list">
-          <div class="warn-item"><strong>작품 오픈일(론칭일) 회계팀 즉시 공유</strong><p>MG는 작품 '오픈일'을 기준으로 24개월 원가 상각이 시작되므로, 론칭 일자를 누락 없이 전달해야 한다.</p></div>
-          <div class="warn-item"><strong>미회수 MG 연말 손상평가 관리</strong><p>연독 중단, 장기 휴재, 완결 후 매출 저조 등으로 MG 회수가 불가능하다고 판단되는 작품은 연말에 MG 손상차손 처리가 필요하므로 회계팀에 사전 공유해야 한다.</p></div>
-          <div class="warn-item"><strong>PG사 결제 내역 대조</strong><p>매월 마감일(D+5)까지 전월 PG사 정산 리포트와 선수수익 상계 내역의 일치 여부를 검증해야 한다.</p></div>
+      <div class="card"><h3><span class="bar"></span>매출 구조</h3>
+        <div class="stepper" id="flow-distmc">
+          <button class="node" onclick="showStep(this,'distmc','recognize')">매출 인식</button>
+          <span class="arrow">→</span>
+          <button class="node" onclick="showStep(this,'distmc','fee')">유통사 수수료</button>
+          <span class="arrow">→</span>
+          <button class="node" onclick="showStep(this,'distmc','settle')">CP 정산</button>
         </div>
+        <div class="flow-detail" id="flow-detail-distmc"></div>
+      </div>
+      <details class="card"><summary><span class="bar"></span>제작비<span class="fold-caret">▾</span></summary>
+        <div class="section-block">
+          <span class="section-title blue">MG</span>
+          <p><strong>웹툰 / IP 프로듀싱</strong> — 선급비용(자산) 처리 후 계약된 MG 진행률상각(실제 진행 비율에 비례)</p>
+          <div class="jr-label">① 지급 시</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>선급비용</td><td>미지급금-거래처</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 선지급</td><td>선급비용 선지급-웹툰MG (기간상각)<br>선급비용 선지급-웹툰MG (진행률상각)<br>선급비용 선지급-웹툰MG (기간상각)-외화<br>선급비용 선지급-웹툰MG (진행률상각)-외화<br>선급비용 선지급-웹툰MG (진행률상각,예술인)<br>선급비용 선지급-내부제작IP</td></tr></table></div>
+          <div class="jr-label">② 상각 (진행률 기준)</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가(외부플랫폼)</td><td>선급비용</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 상각 처리</td><td>선급비용 상각(웹툰_외부-회차인식)<br>선급비용 상각(웹툰_외부-기간인식)<br>선급비용 상각(번역비-기간상각)<br>선급비용 상각(번역비-진행률상각)<br>선급비용 상각(내부제작-회차인식)<br>선급비용 상각(내부제작-기간인식)</td></tr></table></div>
+
+          <p style="margin-top:16px"><strong>소설</strong> — 선급비용(자산) 처리 후 매출연동상각 (실적 발생액에 비례)</p>
+          <table><tr><th>구분</th><th>지급구조</th><th>금액</th></tr>
+            <tr><td>선인세</td><td>바로북 → 작가(직접)</td><td>계약금액</td></tr>
+            <tr><td>선투자</td><td>타 플랫폼 → 바로북 → 작가</td><td>계약금액 × 작가 정산율</td></tr></table>
+          <div class="jr-label">① 지급 시 (선인세/선투자 공통)</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>선급비용-소설(기간상각)</td><td>미지급금-거래처</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 선지급</td><td>선급비용 선지급-소설(MG)</td></tr></table></div>
+          <p style="margin-top:12px"><strong>② 상각</strong> — 선인세는 바로북 정산 상계액, 선투자는 CP사(카카오/네이버) 상계액 기준으로 그대로 원가 인식한다.</p>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가(외부플랫폼)-소설_인세(회차인식)</td><td>선급비용-소설(기간상각)</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 상각 처리</td><td>선급비용 상각(소설-기간인식)</td></tr></table></div>
+
+          <p style="margin-top:16px"><strong>기타 자산화 항목</strong> — MG 포함 어시(작업 보조인력) 비용 등 정식 제작 원가 중 MG에 묶인 금액은 선급비용으로 합산하여 함께 상각한다.</p>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 선지급</td><td>선급비용 선지급-기타(외화)<br>선급비용 선지급-기타</td></tr></table></div>
+        </div>
+
+        <div class="section-block">
+          <span class="section-title amber">즉시 비용처리</span>
+          <p><strong>계약금, 매절, 보장인세, 번역비 등</strong> — 자산화(선급비용 처리) 없이 회차별 즉시 비용(서비스매출원가)으로 처리한다 (이미 즉시 비용 처리되어 상각 대상이 아님).</p>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가</td><td>미지급금-거래처</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 선지급</td><td>선급비용 선지급-소설(보장인세)<br>선급비용 선지급-소설(매절)<br>선급비용 선지급-봄툰소설(계약금)<br>선급비용 선지급-소설(계약금)<br>선급비용 선지급-웹툰보장인세(내부)<br>선급비용 선지급-웹툰보장인세(외부)<br>선급비용 선지급-웹툰매절(내부)<br>선급비용 선지급-웹툰매절(외부)<br>선급비용 선지급-웹툰인세(내부)<br>선급비용 선지급-웹툰인세(외부)</td></tr><tr><td>외주용역비</td><td>교정/편집/타이포/일러스트_외주_소설(개인)<br>교정/편집/타이포/일러스트_외주_소설(사업자)</td></tr><tr><td>번역비</td><td>번역비-원가 (웹툰플랫폼)<br>번역비-원가 (외부플랫폼)</td></tr></table></div>
+          <div class="callout"><span class="callout-label">확인 필요</span><p>플랫폼(자사) 외주 처리 기준과의 구분 정리가 필요하다.</p></div>
+          <p style="margin-top:12px"><strong>기타</strong> — MG와 무관한 샘플비용은 즉시 비용 처리(상각 없음). 타이틀·표지 제작비, MG미포함 어시비용은 정식 원가로 처리되지만 MG 상각 대상은 아니다.</p>
+        </div>
+
+        <div class="subhead">제작 관련 비용의 계정 분류 (매출원가 vs 지급수수료)</div>
+        <table><tr><th>구분</th><th>대상 항목</th><th>미오픈 시 계정</th><th>오픈/연재 시 계정</th><th>비고</th></tr>
+          <tr><td>정식 회차 비용</td><td>1회차, 2회차 등 실제 론칭 회차 채색/작화</td><td>선급비용</td><td>서비스매출원가</td><td>매출과 연계되는 진짜 원가</td></tr>
+          <tr><td>테스트/샘플 비용</td><td>테스트, 샘플 등</td><td>지급수수료</td><td>지급수수료</td><td>원가 아님</td></tr></table>
+
+        <div class="subhead">해외 플랫폼 특이사항</div>
+        <p>해외 건의 경우 국가별 부가가치세(VAT) 상충 및 환율 이슈로 MG 계약을 최소화한다.</p>
+        <div class="callout blue"><span class="callout-label">참고</span><p>국내매출 — 면세<br>해외매출 — 과세. 상세 기준은 세무 Wiki 참고.</p></div>
+      </details>
+      <details class="card"><summary><span class="bar"></span>계열사 간 내부 정산<span class="fold-caret">▾</span></summary>
+        <p><strong>원칙</strong> — 당사(예: 키다리스튜디오) 명의로 유통 정산금이 들어왔더라도, 실제 IP 권리자가 타 법인(예: 레진엔터테인먼트)인 경우 당사 매출로 인식하지 않는다.</p>
+        <p><strong>처리 방식</strong> — 당사로 들어온 정산금은 예수금으로 처리한 후 타 법인으로 재정산·지급한다.</p>
+        <div class="stepper" id="flow-affiliate">
+          <button class="node" onclick="showStep(this,'affiliate','dist')">유통사 정산</button>
+          <span class="arrow">→</span>
+          <button class="node" onclick="showStep(this,'affiliate','internal')">법인 간 내부 정산</button>
+          <span class="arrow">→</span>
+          <button class="node" onclick="showStep(this,'affiliate','final')">CP 최종 정산</button>
+        </div>
+        <div class="flow-detail" id="flow-detail-affiliate"></div>
+      </details>`
+  },
+  'dist/국내유통': {
+    title:'유통 — 국내유통', crumb:['회계','유통','국내유통'], chips:[['blue','국내 B2B']],
+    body:`
+      <div class="card"><h3><span class="bar"></span>매출 인식</h3>
+        <p>확정 정산서 수령 시 매출을 인식한다.</p>
+      </div>
+      <div class="card"><h3><span class="bar"></span>세무 구분</h3>
+        <div class="kv">
+          <div class="k">조건</div><div class="v">국내에서 ISBN을 받은 웹소설/전자책을 국내 플랫폼에 유통할 때</div>
+          <div class="k">회계 처리</div><div class="v">부가가치세법상 '면세' 대상이므로, 부가세가 없는 '면세 계산서' 발행</div>
+        </div>
+        <div class="callout blue"><span class="callout-label">참고</span><p>상세 기준은 세무 Wiki를 참고한다.</p></div>
+      </div>
+      <div class="card"><h3><span class="bar"></span>정산</h3>
+        <p>매출 확정 시 계약된 RS/MG 조건에 맞춰 CP 정산을 진행한다.</p>
+      </div>`
+  },
+  'dist/해외유통': {
+    title:'유통 — 해외유통', crumb:['회계','유통','해외유통'], chips:[['blue','해외 B2B']],
+    body:`
+      <div class="card"><h3><span class="bar"></span>매출 인식</h3>
+        <p><strong>원칙</strong> — 확정 정산서를 수취하는 시점에 그 환율을 적용해 매출을 인식한다.</p>
+        <p><strong>정산 주기</strong> — 분기 정산. 시차 대응을 위해 매출 당월에 <strong>예정원가(약 50%)</strong>를 선반영하고, 정산서 수령 시 확정한다 (미지급비용-예정원가).</p>
+        <p><strong>확정 정산서 도착 후</strong> — 실제 확정 매출로 인식하고, 이전에 잡아뒀던 예정원가는 실제 확정 원가로 정정한다.</p>
+        <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>예정원가 계상</td><td>서비스매출원가 / 미지급비용-예정원가</td></tr></table></div>
+      </div>
+      <div class="card"><h3><span class="bar"></span>해외 플랫폼 매출인식 (레진 US / JP)</h3>
+        <p><strong>정산 주기</strong> — 분기 정산.</p>
+        <p><strong>로열티 수익 구조</strong> — 레진 KR은 US/JP 해외 법인의 정산을 통합 관리하며, 해당 해외 법인 발생 매출의 30%를 로열티 매출(수익)로 수령·인식한다.</p>
+      </div>
+      <div class="card"><h3><span class="bar"></span>세무 구분</h3>
+        <p><strong>원칙</strong> — 국내 면세 규정(ISBN)이 적용되지 않아 국내법상 면세가 아니므로 기본 성격은 '과세 대상 용역'으로 분류된다.</p>
+        <p><strong>혜택</strong> — 단, 국외 제공 용역(수출)에 해당하므로 세율 0%인 '영세율'을 적용한다.</p>
+        <table style="margin-top:14px"><tr><th>구분</th><th>국내 유통 (ISBN 소설)</th><th>해외 유통 (소설/웹툰 전체)</th></tr>
+          <tr><td>면세 여부</td><td>국내 면세 (ISBN 혜택)</td><td>면세 적용 불가</td></tr>
+          <tr><td>회계상 구분</td><td>면세</td><td>과세 (단, 수출이므로 0% 영세율 적용)</td></tr></table>
+        <div class="callout blue"><span class="callout-label">참고</span><p>상세 기준은 세무 Wiki를 참고한다.</p></div>
+      </div>
+      <div class="card"><h3><span class="bar"></span>정산</h3>
+        <p><strong>정산 주기</strong> — 분기 정산.</p>
+        <p>매출 확정 시 계약된 RS/MG 조건에 맞춰 CP 정산을 진행한다.</p>
+      </div>`
+  },
+  'dist/해외출판': {
+    title:'유통 — 해외출판', crumb:['회계','유통','해외출판'], chips:[['blue','로열티']],
+    body:`
+      <div class="card"><h3><span class="bar"></span>제작 주체</h3>
+        <p>국내 출판과 달리 외국 현지 출판사가 인쇄·제작·유통을 전적으로 담당한다.</p>
+      </div>
+      <div class="card"><h3><span class="bar"></span>매출 인식</h3>
+        <p>해외 출판사가 정산해 주는 판매 로열티는 회사의 <strong>서비스매출</strong>로 인식되며, 해당 로열티 중 작가/CP에게 넘겨주는 몫은 <strong>서비스매출원가</strong>로 처리된다.</p>
+      </div>`
+  },
+  'dist/유의사항': {
+    title:'유통 — 유의사항', crumb:['회계','유통','유의사항'], chips:[['amber','필독']],
+    body:`
+      <div class="card"><h3><span class="bar warn"></span>미회수 MG에 대한 연말 손상평가 및 회계 처리</h3>
+        <div class="warn-list">
+          <div class="warn-item"><strong>손상평가 대상</strong><p>연독 중단, 장기 휴재, 완결 후 매출 저조 등의 사유로 선급 MG의 회수가 불가능할 것으로 예상되는 작품</p></div>
+        </div>
+        <table style="margin-top:16px"><tr><th>구분</th><th>상각 방식</th><th>비고</th></tr>
+          <tr><td>소설사업부</td><td>매출 연동 상각<br><small style="color:var(--gray-5)">(유저 매출 발생 시 비율대로 상각)</small></td><td>매출 미발생 작품은 MG가 상각되지 않고 자산(선급비용)으로 계속 남는다. 매년 말 결산 시 회수 불가능한 소설 MG 목록을 회계팀에 전달한다.</td></tr>
+          <tr><td>웹툰사업부</td><td>24개월 균등 상각</td><td>회계팀이 자동 처리한다.</td></tr></table>
       </div>`
   },
 
@@ -499,41 +720,201 @@ const DOCS = {
 /* ================= 흐름도 단계별 상세 ================= */
 const STEP_DETAILS = {
   maechul: {
-    charge:    {t:'코인 충전', d:'현금이 들어오지만 아직 서비스를 제공한 것이 아니므로 선수수익(부채)으로 처리한다.'},
-    read:      {t:'콘텐츠 열람(소진)', d:'유저가 코인을 사용하여 작품을 소진하는 시점에 비로소 수익(매출)으로 전환 인식한다.'},
-    recognize: {t:'매출 인식', d:'코인이 소진되는 시점에 발생주의 원칙에 따라 매출로 인식한다. 이 시점부터 CP 정산 대상 금액이 확정된다.'},
-    settle:    {t:'CP 정산', d:'매출 인식 후, 소진된 코인 금액에 맞춰 CP(작가/제작사) 수익배분(RS) 정산 단계로 진행한다.'},
+    charge: {t:'코인 충전', body:`
+      <p>현금이 들어오지만 아직 서비스를 제공한 것이 아니므로 <strong>선수수익(부채)</strong>으로 처리한다.</p>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>외상매출금 1,000</td><td>선수수익-미사용코인 1,000</td></tr></table>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>PG사 정산</td><td>PG사 코인 결제 (원화)<br>PG사 코인 결제 (외화)</td></tr></table></div>`},
+    recognize: {t:'콘텐츠 열람(매출 인식)', body:`
+      <p>유저가 코인을 사용해 작품을 소진하는 시점에 <strong>매출</strong>로 전환 인식한다.</p>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>선수수익-미사용코인 800</td><td>서비스매출(웹툰플랫폼)_코인사용 800</td></tr></table>
+      <p style="margin-top:12px"><strong>미사용 코인</strong> — 소멸시효가 지나거나 미사용한 코인은 추후 매출로 반영한다.</p>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>선수수익-미사용코인</td><td>서비스매출(웹툰플랫폼)_코인사용</td></tr></table>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>코인 수불관리</td><td>코인사용 매출 (PG)<br>코인소멸 매출</td></tr></table></div>`},
+    pgfee: {t:'PG 수수료 차감', body:`
+      <p>PG사에게 수수료를 지급하며 <strong>서비스매출원가_PG수수료</strong>로 처리한다.</p>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>PG사 정산</td><td>PG수수료 (웹툰플랫폼)</td></tr></table></div>
+      <details class="jr-toggle"><summary>순액 vs 총액 참고</summary>
+        <p style="margin-bottom:10px">수수료를 매출 차감(순액)으로 볼지 비용(총액)으로 볼지는 계약·통제 기준으로 판단한다 (K-IFRS 1115호 본인/대리인).</p>
+        <div class="dual">
+          <div>
+            <div class="subhead">순액법</div>
+            <div class="jr-label">① 순액 기준으로 매출 인식 — 총 결제 800 중 PG수수료 100 차감</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>외상매출금 800</td><td>서비스매출 700</td></tr><tr><td></td><td>미지급금(PG수수료) 100</td></tr></table>
+            <div class="jr-label">② 상계 — 수수료만큼 채권에서 차감</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금(PG수수료) 100</td><td>외상매출금 100</td></tr></table>
+            <div class="jr-label">③ 남은 순액만 현금 회수</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>보통예금 700</td><td>외상매출금 700</td></tr></table>
+          </div>
+          <div>
+            <div class="subhead">총액법</div>
+            <div class="jr-label">① 총액 그대로 매출 인식</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>외상매출금 800</td><td>서비스매출 800</td></tr></table>
+            <div class="jr-label">② PG 수수료 발생 및 원가 계상</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가_PG수수료 100</td><td>미지급금 100</td></tr></table>
+            <div class="jr-label">③ PG사 정산 및 채권/채무 상계</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>보통예금 700</td><td>외상매출금 800</td></tr><tr><td>미지급금 100</td><td></td></tr></table>
+          </div>
+        </div>
+      </details>`},
+    settle: {t:'CP 정산', body:`
+      <p>계약한 MG/RS에 맞게 CP 정산을 진행한다.</p>
+      <div class="jr-label">① 정산 확정 시</div>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가 300</td><td>미지급금-거래처 300</td></tr></table>
+      <div class="jr-label">② CP 현금 지급 시</div>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금-거래처 300</td><td>보통예금 300</td></tr></table>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>정산 대금 지급</td><td>거래처대금지급(소설)<br>거래처대금지급(웹툰)</td></tr></table></div>`},
+    profit: {t:'자사 귀속 손익', body:`<p>CP 정산 후 남은 최종 금액이 회사의 손익이 된다. 아래 손익 분해의 마지막 줄을 참고한다.</p>`},
   },
   mg: {
-    contract: {t:'계약 & MG 지급', d:'작가·CP 계약 시 지급하는 MG/계약금은 우선 선급비용(자산)으로 처리한다.'},
-    launch:   {t:'작품 론칭(Open)', d:'작품이 오픈하는 시점부터 원가 전환이 시작되며, 24개월 균등 상각 스케줄이 적용된다.'},
-    service:  {t:'서비스 24개월간', d:'매월 1/24씩 선급비용을 매출원가로 반영한다.'},
+    contract: {t:'계약 · MG 지급', body:`
+      <p><strong>[자산 계상]</strong> 작가에게 지급하는 MG는 우선 선급비용(자산)으로 처리한다.</p>
+      <div class="jr-label">예시 — MG 2,400만원 선지급</div>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>선급비용-MG 2,400만원</td><td>미지급금-거래처 2,400만원</td></tr></table>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 선지급</td><td>선급비용 선지급-소설(MG)<br>선급비용 선지급-웹툰MG (기간상각)<br>선급비용 선지급-웹툰MG (진행률상각)<br>선급비용 선지급-웹툰MG (기간상각)-외화<br>선급비용 선지급-웹툰MG (진행률상각)-외화<br>선급비용 선지급-웹툰MG (진행률상각,예술인)</td></tr></table></div>`},
+    launch: {t:'작품 론칭(Open)', body:`<p>작품이 오픈하는 시점부터 원가 전환(상각)이 시작된다.</p>`},
+    service: {t:'서비스 24개월간', body:`
+      <p><strong>[매월 상각]</strong> 오픈 시점부터 24개월간 균등 상각(1/24씩)하여 서비스매출원가로 반영한다.</p>
+      <div class="jr-label">예시 — 월 상각액 100만원</div>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가 100만원</td><td>선급비용-MG 100만원</td></tr></table>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선급비용 상각 처리</td><td>선급비용 상각(웹툰-회차인식)<br>선급비용 상각(웹툰-기간인식)</td></tr></table></div>`},
+  },
+  affiliate: {
+    dist: {t:'유통사 정산', body:`
+      <p>유통사 정산금 수령 시 — 당사 매출이 아니다.</p>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>외상매출금</td><td>예수금-거래처(레진)</td></tr></table>`},
+    internal: {t:'법인 간 내부 정산', body:`
+      <p>당사로 들어온 정산금은 예수금으로 처리한 뒤 타 법인으로 재정산 지급한다.</p>
+      <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>예수금-거래처(레진)</td><td>미지급금-거래처(레진)</td></tr></table>`},
+    final: {t:'CP 최종 정산', body:`<p>재정산을 받은 법인이 원작자/CP에게 최종 정산금을 지급한다.</p>`},
+  },
+  distmc: {
+    recognize: {t:'매출 인식', body:`
+      <div class="dual">
+        <div>
+          <div class="subhead">즉시 매출 인식</div>
+          <p>(세금)계산서 발행 시점에 즉시 서비스매출로 인식한다. 공급 의무가 그 시점에 완료되거나, 별도의 대금 선수령이 없는 일반 유통사 거래 건에 해당한다.</p>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>원화외상매출금 1,000</td><td>서비스매출 1,000</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>외부 매출 확정</td><td>서비스매출 원화(외부채널)-소설<br>서비스매출 원화(외부채널)-소설_관계사<br>서비스매출 외화(외부채널)-소설<br>서비스매출 외화(외부채널)-소설_관계사<br>서비스매출 원화(외부채널)-웹툰<br>서비스매출 원화(외부채널)-웹툰_관계사<br>서비스매출 외화(외부채널)-웹툰<br>서비스매출 외화(외부채널)-웹툰_관계사<br>서비스매출 외화(타사유통)-출판<br>서비스매출 원화(타사유통)-출판<br>서비스매출_원화_(타사유통)-IP<br>서비스매출_원화_(타사유통)-IP_관계사<br>서비스매출_외화_(타사유통)-IP<br>서비스매출_외화_(타사유통)-IP_관계사</td></tr></table></div>
+        </div>
+        <div>
+          <div class="subhead">선수수익(부채) 인식 후 매출 분할 인식</div>
+          <p>선수수익(부채)을 계상한 후, 확정 정산금만큼 서비스매출을 분할 인식한다. 대금 선수령 형태의 유통사와의 거래 건에 해당한다.</p>
+          <div class="jr-label">① 대금 선수령 시 (부채 계상)</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>원화외상매출금 1,300</td><td>선수수익 1,300</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>선수수익 수시 청구</td><td>선수수익 청구(원화-소설)<br>선수수익 청구(외화-소설)<br>선수수익 청구(원화-웹툰)<br>선수수익 청구(외화-웹툰)</td></tr><tr><td>선수수익 결산 청구</td><td>선수수익 청구(결산-원화_소설)<br>선수수익 청구(결산-외화_소설)<br>선수수익 청구(결산-원화_MG회차인식)<br>선수수익 청구(결산-외화_MG회차인식)</td></tr></table></div>
+          <div class="jr-label">② 실제 매출 발생 시 (매출 분할 인식)</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>선수수익 1,000</td><td>서비스매출 1,000</td></tr></table>
+          <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>외부 매출 확정 - 선수수익 매출인식</td><td>선수수익 매출인식(웹툰)<br>선수수익 매출인식(웹툰) - 초과매출<br>선수수익 매출인식(소설)<br>선수수익 매출인식(소설) - 초과매출<br>선수수익 매출인식(웹툰)_관계사<br>선수수익 매출인식(웹툰)_관계사 - 초과매출</td></tr><tr><td>선수수익 상각/상계</td><td>선수수익 매출인식(소설)<br>선수수익 매출인식(웹툰)</td></tr></table></div>
+        </div>
+      </div>
+      <div class="callout"><span class="callout-label">확인 필요</span><p>'외부 매출 확정 - 선수수익 매출인식'과 '선수수익 상각/상계' 두 분류코드의 항목이 겹쳐 보여 차이 확인이 필요하다.</p></div>`},
+    fee: {t:'유통사 수수료', body:`
+      <p>유통사에게 수수료를 지급하며 <strong>서비스매출원가_PG수수료</strong>로 처리한다.</p>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>PG사 정산</td><td>PG수수료 (웹툰플랫폼)</td></tr></table></div>
+      <details class="jr-toggle"><summary>순액 vs 총액 참고</summary>
+        <p style="margin-bottom:10px">수수료를 매출 차감(순액)으로 볼지 비용(총액)으로 볼지 계약·통제 기준으로 판단한다 (K-IFRS 1115호 본인/대리인).</p>
+        <div class="dual">
+          <div>
+            <div class="subhead">순액법</div>
+            <div class="jr-label">① 순액 기준으로 매출 인식 — 총 결제 800 중 수수료 100 차감</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>외상매출금 800</td><td>서비스매출 700</td></tr><tr><td></td><td>미지급금(수수료) 100</td></tr></table>
+            <div class="jr-label">② 상계 — 수수료만큼 채권에서 차감</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금(수수료) 100</td><td>외상매출금 100</td></tr></table>
+            <div class="jr-label">③ 남은 순액만 현금 회수</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>보통예금 700</td><td>외상매출금 700</td></tr></table>
+          </div>
+          <div>
+            <div class="subhead">총액법</div>
+            <div class="jr-label">① 총액 그대로 매출 인식</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>외상매출금 800</td><td>서비스매출 800</td></tr></table>
+            <div class="jr-label">② 수수료 발생 및 원가 계상</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가_PG수수료 100</td><td>미지급금 100</td></tr></table>
+            <div class="jr-label">③ 유통사 정산 및 채권/채무 상계</div>
+            <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>보통예금 700</td><td>외상매출금 800</td></tr><tr><td>미지급금 100</td><td></td></tr></table>
+          </div>
+        </div>
+      </details>`},
+    settle: {t:'CP 정산', body:`
+      <div class="dual">
+        <div>
+          <div class="subhead">RS ≤ MG<small>예) RS 70만원 &lt; MG 100만원</small></div>
+          <p>정해진 상각액 100만원을 원가로 반영하고 선급비용을 차감한다 (추가 현금 지급 없음).</p>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가 100만원</td><td>선급비용-MG 100만원</td></tr></table>
+          <div class="jr-label">CP 현금 지급 시</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금-거래처 100만원</td><td>보통예금 100만원</td></tr></table>
+        </div>
+        <div>
+          <div class="subhead">RS &gt; MG<small>예) RS 150만원 &gt; MG 100만원</small></div>
+          <p>월 상각액 100만원을 원가로 반영하여 선급비용을 차감하고, 초과분 50만원은 추가 정산(미지급금)한다.</p>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>서비스매출원가 150만원</td><td>선급비용-MG 100만원</td></tr><tr><td></td><td>미지급금-거래처 50만원</td></tr></table>
+          <div class="jr-label">CP 현금 지급 시</div>
+          <table class="jr-table"><tr><th>차변</th><th>대변</th></tr><tr><td>미지급금-거래처 150만원</td><td>보통예금 150만원</td></tr></table>
+        </div>
+      </div>
+      <button class="s2-link" onclick="openS2(this)">S2 분류코드 · 정산항목 보기</button><div class="s2-source" hidden><table class="s2-table"><tr><th>분류코드</th><th>정산항목</th></tr><tr><td>정산 대금 지급</td><td>거래처대금지급(소설)<br>거래처대금지급(웹툰)</td></tr><tr><td>정산대금추가지급</td><td>RS_추가지급_원화_소설(개인)<br>RS_추가지급_원화_소설(사업자)</td></tr></table></div>`},
   },
 };
 function showStep(btn,flowId,stepId){
-  const flow=btn.closest('.flow');
-  flow.querySelectorAll('.step').forEach(s=>s.classList.remove('hl'));
+  const flow=btn.closest('.stepper');
+  flow.querySelectorAll('.node').forEach(s=>s.classList.remove('hl'));
   btn.classList.add('hl');
   const detail=document.getElementById('flow-detail-'+flowId);
   const data=(STEP_DETAILS[flowId]||{})[stepId];
   if(detail && data){
-    detail.innerHTML=`<span class="t">${data.t}</span><p>${data.d}</p>`;
+    detail.innerHTML=data.body;
     detail.classList.add('show');
   }
+  const eb=document.getElementById('eb-'+flowId);
+  if(eb){
+    eb.querySelectorAll('[data-eb]').forEach(el=>el.classList.remove('active'));
+    const target=eb.querySelector(`[data-eb="${stepId}"]`);
+    if(target) target.classList.add('active');
+  }
 }
+
+function openS2(btn){
+  const src=btn.nextElementSibling;
+  const card=btn.closest('.card');
+  if(!src || !card) return;
+  const drawer=document.getElementById('s2Drawer');
+  card.appendChild(drawer);
+  document.getElementById('s2DrawerBody').innerHTML=src.innerHTML;
+  drawer.classList.add('show');
+}
+function closeS2(){
+  const drawer=document.getElementById('s2Drawer');
+  if(!drawer) return;
+  drawer.classList.remove('show');
+  document.getElementById('s2Home').appendChild(drawer);
+}
+document.addEventListener('click',function(e){
+  const drawer=document.getElementById('s2Drawer');
+  if(!drawer.classList.contains('show')) return;
+  if(drawer.contains(e.target) || e.target.classList.contains('s2-link')) return;
+  closeS2();
+});
 
 /* ================= 상태 ================= */
 let curTab='acc', curView='type', curKey='platform/매출구조';
 const treeKey = ()=> curTab+'|'+curView;
 
 /* ================= 렌더 ================= */
+let openCatSets={};
+function getOpenSet(){
+  const key=treeKey();
+  if(!openCatSets[key]){ openCatSets[key]=new Set([TREES[key].groups[0].id]); }
+  return openCatSets[key];
+}
 function renderTree(){
   const t=document.getElementById('tree');
   const tree=TREES[treeKey()];
+  const openSet=getOpenSet();
+  const curGroupId=curKey.split('/')[0];
+  if(tree.groups.some(g=>g.id===curGroupId)) openSet.add(curGroupId);
   let html='';
   if(tree.note){ html+=`<div class="placeholder-note">${tree.note}</div>`; }
   tree.groups.forEach((g,i)=>{
-    const open = curKey.startsWith(g.id+'/') || i===0 ? 'open':'';
+    const open = openSet.has(g.id) ? 'open':'';
     html+=`<div class="cat ${open}" id="cat-${g.id}">
       <button class="cat-head" onclick="toggleCat('${g.id}')"><span class="cat-emoji">${g.emoji}</span>${g.name}<span class="cat-arrow">▶</span></button>
       <div class="cat-items">${g.leaves.map(l=>{
@@ -569,16 +950,23 @@ function renderDoc(){
       <div class="card"><h3><span class="bar"></span>개요</h3><p style="color:var(--gray-5)">이 항목의 매뉴얼을 작성하는 자리입니다. (구조·인식 기준·유의사항 등)</p></div>
       <div class="card"><h3><span class="bar"></span>핵심 포인트</h3><p style="color:var(--gray-5)">표·흐름도·체크리스트로 실무 포인트를 정리합니다.</p></div>`;
   }
+  const firstNode=c.querySelector('.stepper .node');
+  if(firstNode) firstNode.click();
   c.scrollTop=0;
 }
 
 /* ================= 인터랙션 ================= */
-function toggleCat(id){ document.getElementById('cat-'+id).classList.toggle('open'); }
-function openDoc(key){ curKey=key; renderTree(); renderDoc(); }
+function toggleCat(id){
+  const s=getOpenSet();
+  if(s.has(id)) s.delete(id); else s.add(id);
+  document.getElementById('cat-'+id).classList.toggle('open');
+}
+function openDoc(key){ closeS2(); curKey=key; renderTree(); renderDoc(); }
 
 function firstKey(){ const tr=TREES[treeKey()]; return tr.groups[0].id+'/'+tr.groups[0].leaves[0]; }
 
 function switchTab(tab){
+  closeS2();
   curTab=tab;
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===tab));
   document.getElementById('sideTitle').textContent = tab==='acc'?'회계 매뉴얼':'세무 매뉴얼';
@@ -586,6 +974,7 @@ function switchTab(tab){
   curKey=firstKey(); renderTree(); renderDoc();
 }
 function switchView(view){
+  closeS2();
   curView=view;
   document.querySelectorAll('.view-switch button').forEach(b=>b.classList.toggle('on',b.dataset.view===view));
   curKey=firstKey(); renderTree(); renderDoc();
