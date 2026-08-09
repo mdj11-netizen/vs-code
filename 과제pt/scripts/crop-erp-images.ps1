@@ -12,8 +12,8 @@
 
 Add-Type -AssemblyName System.Drawing
 
-$SrcDir = "C:\Users\mdj11\OneDrive - 다우키움그룹\claude\과제pt\wiki\사진"
-$DstDir = "C:\Users\mdj11\OneDrive - 다우키움그룹\claude\accounting-wiki\assets\erp"
+$SrcDir = Join-Path $PSScriptRoot "..\wiki\사진"
+$DstDir = Join-Path $PSScriptRoot "..\..\accounting-wiki\assets\erp"
 $BorderRGB = 204      # 감지 대상 테두리 색
 $Tolerance = 20        # ±허용치 — 실측 결과 우측 테두리 라인이 (210~218) 정도로 살짝 번져
                        # 있어(안티에일리어싱) 12는 너무 좁았다. 20으로 넓히고 전체 행/열을
