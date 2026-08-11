@@ -75,18 +75,12 @@
 
   /* ---- dark section scope: redefines shared tokens so every existing component (card, tile, tag...) auto-renders in navy ---- */
   .section-dark{
-    background:#0F172A; color:var(--ink);
+    background:#0F172A;
     --bg:#0F172A; --surface:#0F172A; --surface-2:#1E293B;
-    --ink:#F8FAFC; --ink-soft:#CBD5E1; --ink-faint:#94A3B8;
+    --ink:#F8FAFC; --ink-soft:#94A3B8; --ink-faint:#64748B;
     --line:#25304A; --line-strong:#334155;
     --accent:#60A5FA; --accent-deep:#60A5FA; --accent-soft:rgba(96,165,250,.14);
   }
-  /* headings/labels below don't declare their own color, so on dark slides they
-     otherwise keep the light-theme ink inherited from body — force them light here */
-  .section-dark h1.slide-title,
-  .section-dark .stat-tile h4,
-  .section-dark .num-card h4,
-  .section-dark .dark-banner{ color:var(--ink); }
 
   .eyebrow-row{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-shrink:0; }
   .eyebrow{ display:flex; align-items:center; gap:10px; font-family:var(--mono); font-size:12.5px; font-weight:700; letter-spacing:.04em; color:var(--accent-deep); text-transform:uppercase; }
@@ -158,12 +152,6 @@
   .ratio-row .colon{ font-size:22px; color:var(--ink-faint); }
   .ratio-labels{ display:flex; justify-content:center; gap:60px; margin-bottom:6px; }
   .ratio-labels span{ font-size:12px; color:var(--ink-faint); }
-
-  /* ---- secondary mini-stat row (WHY · 문의구조 세부 지표) ---- */
-  .mini-stat-row{ display:flex; gap:8px; }
-  .mini-stat{ flex:1; text-align:center; background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:8px 4px; }
-  .mini-stat b{ display:block; font-size:18px; font-weight:800; color:var(--accent-deep); letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
-  .mini-stat span{ display:block; margin-top:2px; font-size:9.5px; line-height:1.35; color:var(--ink-faint); }
 
   /* ---- horizontal stacked bar ---- */
   .stackbar{ display:flex; height:34px; border-radius:8px; overflow:hidden; margin:8px 0 14px; }
@@ -243,44 +231,6 @@
   .stat-tile p{ margin:0; font-size:12px; line-height:1.6; color:var(--ink-soft); }
   .note-bar{ padding:13px 20px; background:var(--surface-2); border:1px solid var(--line); border-radius:12px; text-align:center; font-size:12.5px; color:var(--ink-soft); }
 
-  /* ---- 정량 성과 상세: hero + before/after bar (accent color set per-slide via --stat-c) ---- */
-  .impact-grid{ display:grid; grid-template-columns:29% 1fr; gap:20px; align-items:stretch; }
-  .impact-hero{ background:var(--surface-2); border:1px solid var(--line); border-left:4px solid var(--stat-c); border-radius:14px; padding:22px 20px; display:flex; flex-direction:column; }
-  .impact-hero .lbl{ font-size:12.5px; font-weight:800; color:var(--stat-c); }
-  .impact-hero .num{ margin-top:10px; font-size:46px; font-weight:800; letter-spacing:-.02em; color:var(--stat-c); font-variant-numeric:tabular-nums; }
-  .impact-hero .sub{ margin-top:8px; font-size:12.5px; font-weight:700; color:var(--ink); }
-  .impact-hero .desc{ margin-top:auto; padding-top:12px; border-top:1px solid var(--line); font-size:11.5px; line-height:1.6; color:var(--ink-soft); }
-  .impact-chart{ display:flex; flex-direction:column; gap:12px; justify-content:center; }
-  .impact-chart-title{ font-size:12.5px; font-weight:800; color:var(--ink); }
-  .bar-row{ display:grid; grid-template-columns:132px 1fr 64px 78px; align-items:center; gap:10px; }
-  .bar-row .bl b{ display:block; font-size:12px; font-weight:800; color:var(--ink-faint); }
-  .bar-row .bl span{ display:block; font-size:9.5px; line-height:1.4; color:var(--ink-faint); }
-  .bar-row.after .bl b{ color:var(--stat-c); }
-  .bar-track{ height:26px; border-radius:6px; background:var(--surface-2); border:1px solid var(--line); overflow:hidden; }
-  .bar-fill{ height:100%; border-radius:6px 0 0 6px; background:var(--line-strong); }
-  .bar-row.after .bar-fill{ background:var(--stat-c); }
-  .bar-row .val{ font-size:12.5px; font-weight:800; text-align:right; color:var(--ink-faint); font-variant-numeric:tabular-nums; }
-  .bar-row.after .val{ color:var(--stat-c); }
-  .bar-row .tag{ font-size:10px; font-weight:800; text-align:center; padding:6px 4px; border-radius:6px; background:var(--surface); color:var(--ink-faint); }
-  .bar-row.after .tag{ background:var(--stat-c); color:#0B1220; }
-  .impact-notes{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .impact-note{ background:var(--surface-2); border:1px solid var(--line); border-radius:11px; padding:12px 14px; }
-  .impact-note b{ display:block; font-size:12px; font-weight:800; color:var(--stat-c); margin-bottom:3px; }
-  .impact-note p{ margin:0; font-size:11px; color:var(--ink-soft); line-height:1.55; }
-
-  /* ---- 결과물 제작 설명 슬라이드 (스크린샷 자리 + 무엇을/어떻게) ---- */
-  .build-row{ display:flex; gap:24px; align-items:stretch; flex:1; min-height:0; }
-  .build-shot{ flex-shrink:0; width:46%; border-radius:12px; border:1.5px dashed var(--line-strong); background:var(--surface-2); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:var(--ink-faint); text-align:center; padding:20px; }
-  .build-shot .ic{ font-size:26px; }
-  .build-shot b{ font-size:13px; font-weight:800; color:var(--ink-soft); }
-  .build-shot span{ font-size:11.5px; line-height:1.6; max-width:260px; }
-  .build-info{ flex:1; display:flex; flex-direction:column; gap:14px; min-width:0; }
-  .build-crumb{ font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--accent-deep); }
-  .build-block b{ display:block; font-size:13px; font-weight:800; margin-bottom:6px; }
-  .build-block ul{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:6px; }
-  .build-block li{ font-size:12px; line-height:1.6; color:var(--ink-soft); padding-left:14px; position:relative; }
-  .build-block li::before{ content:'\2022'; position:absolute; left:0; color:var(--accent-deep); }
-
   /* ---- bordered card (조직 리스크) ---- */
   .bordered-card{ background:var(--surface-2); border:1px solid var(--line-strong); border-radius:14px; padding:20px 22px; }
   .bordered-card h4{ margin:0 0 14px; font-size:15px; font-weight:800; }
@@ -301,7 +251,7 @@
   .closing .footer-bar{ justify-content:center; border-top:none; }
 
   .qa-quote{ text-align:center; }
-  .qa-quote .mark{ font-size:110px; font-weight:800; color:var(--accent-deep); line-height:1; font-family:Georgia,serif; }
+  .qa-quote .mark{ font-size:110px; font-weight:800; color:#1E3A8A; line-height:1; font-family:Georgia,serif; }
   .qa-quote h2{ font-size:26px; font-weight:800; line-height:1.55; margin:6px 0 0; color:#F8FAFC; }
   .qa-quote-tiles{ display:flex; gap:14px; justify-content:center; margin-top:22px; }
   .qa-quote-tiles .t{ background:var(--surface-2); border:1px solid var(--line); border-radius:12px; padding:14px 20px; text-align:left; min-width:200px; }
@@ -338,10 +288,6 @@
     .timeline{ flex-direction:column; gap:16px; } .timeline::before{ display:none; }
     .stat-row{ flex-direction:column; }
     .flow-row{ flex-direction:column; }
-    .impact-grid{ grid-template-columns:1fr; }
-    .bar-row{ grid-template-columns:88px 1fr 50px 60px; }
-    .build-row{ flex-direction:column; }
-    .build-shot{ width:100%; }
   }
 </style>
 </head>
@@ -404,7 +350,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">02 / 24</span>
+        <span class="footer-page">02 / 19</span>
       </div>
     </section>
 
@@ -441,7 +387,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">03 / 24</span>
+        <span class="footer-page">03 / 19</span>
       </div>
     </section>
 
@@ -456,14 +402,7 @@
             <div class="ratio-row"><span class="n">500</span><span class="colon">:</span><span class="n small">8</span></div>
             <div class="ratio-labels"><span>전사 임직원</span><span>회계팀 인원</span></div>
             <div class="divider"></div>
-            <div class="mini-stat-row">
-              <div class="mini-stat"><b>62.5명</b><span>회계팀 1인당<br>담당 임직원</span></div>
-              <div class="mini-stat"><b>12.5건</b><span>D+5 누적 시<br>1인당 하루 처리량</span></div>
-              <div class="mini-stat"><b>125분</b><span>건당 10분 기준<br>1인당 하루 소요시간</span></div>
-            </div>
-            <div class="divider"></div>
-            <p>1인당 하루 처리량 12.5건 × 건당 10분 = 하루 2시간 5분 소모</p>
-            <p>회계팀 전체(8명) 기준 일일 총 1,000분(16.7시간) 질의 응대 발생 → 매일 전담 인력 2명분의 풀타임 리소스 손실</p>
+            <p style="text-align:center">D+5 기준으로만 쌓여도 회계팀 처리 역량을 초과하는 문의량</p>
           </div>
           <div class="col-card">
             <h3>결재 반려 사유 분석 · 2026.6.26~7.19, 150건 기준</h3>
@@ -482,7 +421,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">04 / 24</span>
+        <span class="footer-page">04 / 19</span>
       </div>
     </section>
 
@@ -496,7 +435,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">05 / 24</span>
+        <span class="footer-page">05 / 19</span>
       </div>
     </section>
 
@@ -510,7 +449,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">06 / 24</span>
+        <span class="footer-page">06 / 19</span>
       </div>
     </section>
 
@@ -543,7 +482,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">07 / 24</span>
+        <span class="footer-page">07 / 19</span>
       </div>
     </section>
 
@@ -561,7 +500,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">08 / 24</span>
+        <span class="footer-page">08 / 19</span>
       </div>
     </section>
 
@@ -582,7 +521,7 @@
             <span class="label">거래구조 설명</span>
             <span class="asis">단순화되어 세부 사업부별 특수성 미반영</span>
             <span class="arrow">→</span>
-            <span class="tobe">5개 매출유형별 거래구조 표준화</span>
+            <span class="tobe">6개 매출유형별 거래구조 표준화</span>
           </div>
           <div class="compare-row">
             <span class="label">실무 보조 도구</span>
@@ -600,7 +539,7 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">09 / 24</span>
+        <span class="footer-page">09 / 19</span>
       </div>
     </section>
 
@@ -620,104 +559,11 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">10 / 24</span>
+        <span class="footer-page">10 / 19</span>
       </div>
     </section>
 
-    <!-- 11. DEMO · 제작 설명 1 — 플랫폼 매출인식 -->
-    <section class="slide">
-      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>DEMO · 이렇게 만들었습니다 ①</span><span class="corner-label">플랫폼 매출인식 탭</span></div>
-      <div class="slide-body">
-        <h1 class="slide-title">플랫폼 <span class="accent">매출 인식</span> 흐름을 클릭 한 번으로</h1>
-        <div class="build-row">
-          <div class="build-shot"><span class="ic">🖼️</span><b>스크린샷 삽입 예정</b><span>플랫폼 › 매출 구조 › 코인 탭 화면</span></div>
-          <div class="build-info">
-            <div class="build-crumb">회계 › 플랫폼 › 매출 구조 (코인) · K-IFRS 1115호</div>
-            <div class="build-block">
-              <b>무엇을 만들었나</b>
-              <ul>
-                <li>코인 충전 → PG 수수료 차감 → <b>플랫폼 매출 인식</b> → CP 정산 → 자사 귀속 손익, 5단계를 클릭 가능한 플로우 다이어그램으로 구성</li>
-                <li>"플랫폼 매출 인식" 스텝을 클릭하면 해당 시점의 분개(회계처리) 예시가 바로 아래 카드에 펼쳐지는 인터랙션 적용</li>
-              </ul>
-            </div>
-            <div class="build-block">
-              <b>왜 이렇게 만들었나</b>
-              <ul>
-                <li>유저가 결제(충전)한 시점 ≠ 실제 매출 인식 시점이라는, 사업부가 가장 자주 놓치는 '체감매출 vs 인식매출' 괴리를 그림 한 장으로 설명</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bar">
-        <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">11 / 24</span>
-      </div>
-    </section>
-
-    <!-- 12. DEMO · 제작 설명 2 — 유통 매출구조 매출 인식 -->
-    <section class="slide">
-      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>DEMO · 이렇게 만들었습니다 ②</span><span class="corner-label">유통 · 매출구조 &gt; 매출 인식</span></div>
-      <div class="slide-body">
-        <h1 class="slide-title">두 갈래 매출 인식 방식을 <span class="accent">탭으로 비교</span></h1>
-        <div class="build-row">
-          <div class="build-shot"><span class="ic">🖼️</span><b>스크린샷 삽입 예정</b><span>유통 › 매출 구조 › 매출 인식 탭 화면</span></div>
-          <div class="build-info">
-            <div class="build-crumb">회계 › 유통 › 매출 구조 › 매출 인식</div>
-            <div class="build-block">
-              <b>무엇을 만들었나</b>
-              <ul>
-                <li>'즉시 매출 인식'과 '선수수익 계상 후 매출 분할 인식', 두 가지 처리 방식을 탭으로 분리 구성</li>
-                <li>각 탭에 실제 ERP 외부매출 확정 화면 스크린샷을 삽입해, 어떤 시스템 화면에서 무엇을 확인해야 하는지 실무 동선과 연결</li>
-              </ul>
-            </div>
-            <div class="build-block">
-              <b>왜 이렇게 만들었나</b>
-              <ul>
-                <li>연재 상태(완결 여부)에 따라 매출/선수수익 판단이 갈리는 실제 오류 사례(FINDINGS 사례 2)의 재발을 막기 위해, 판단 기준을 케이스별로 나눠 비교하도록 설계</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bar">
-        <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">12 / 24</span>
-      </div>
-    </section>
-
-    <!-- 13. DEMO · 제작 설명 3 — 유통 매출원가 -->
-    <section class="slide">
-      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>DEMO · 이렇게 만들었습니다 ③</span><span class="corner-label">유통 · 매출원가 메뉴</span></div>
-      <div class="slide-body">
-        <h1 class="slide-title">매출원가 판단 기준을 <span class="accent">표와 태그</span>로 정리</h1>
-        <div class="build-row">
-          <div class="build-shot"><span class="ic">🖼️</span><b>스크린샷 삽입 예정</b><span>유통 › 매출 원가 메뉴 화면</span></div>
-          <div class="build-info">
-            <div class="build-crumb">회계 › 유통 › 매출 원가</div>
-            <div class="build-block">
-              <b>무엇을 만들었나</b>
-              <ul>
-                <li>매출원가 vs 지급수수료 판단 기준표를 구성하고, MG 지급건·매절 지급건·MG포함 어시비용 등 케이스별 처리 방식을 '매출원가 / 선급비용 경유 / 즉시 인식' 칩(태그)으로 분류</li>
-                <li>행을 클릭하면 해당 케이스의 상세 분개 예시가 펼쳐지는 토글 구조 적용</li>
-              </ul>
-            </div>
-            <div class="build-block">
-              <b>왜 이렇게 만들었나</b>
-              <ul>
-                <li>정식 연재 원가와 테스트 비용(지급수수료) 계정과목을 혼용해 작성한 실제 오류 사례(FINDINGS 사례 1)를 막기 위해, "매출로 이어지는 지출인지"를 가장 앞선 판단 기준으로 세움</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="footer-bar">
-        <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">13 / 24</span>
-      </div>
-    </section>
-
-    <!-- 14. [BONUS] 실제 시스템 라이브 데모 -->
+    <!-- 11. [BONUS] 실제 시스템 라이브 데모 -->
     <section class="slide live-slide">
       <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>BONUS · 실제 시스템 바로 보기</span><span class="corner-label">라이브 데모</span></div>
       <div class="live-bar">
@@ -729,127 +575,25 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">14 / 24</span>
+        <span class="footer-page">11 / 19</span>
       </div>
     </section>
 
-    <!-- 15. IMPACT 1 · 정량적 성과 ① 결재 반려건 -->
+    <!-- 12. IMPACT 1 · 정량 성과 -->
     <section class="slide section-dark">
-      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>IMPACT 1 · 정량적 성과 ①</span><span class="corner-label">Before → After 비교</span></div>
-      <div class="slide-body" style="--stat-c:#34D399">
-        <h1 class="slide-title">회계기준 판단 오류 사전 예방으로 결재 반려건 <span style="color:var(--stat-c)">30%</span> 감축</h1>
-        <div class="impact-grid">
-          <div class="impact-hero">
-            <span class="lbl">결재 반려건 감축 목표</span>
-            <span class="num">30%↓</span>
-            <span class="sub">월 35건 ➔ 24.5건 (-10.5건/월)</span>
-            <span class="desc">전표 상신 전 자가 점검 체계 구축을 통해 결재 반려 및 수정·재처리로 인한 불필요한 행정 공수를 절감합니다.</span>
-          </div>
-          <div class="impact-chart">
-            <div class="impact-chart-title">월간 회계구분 관련 결재 반려건수 비교 (Before vs After)</div>
-            <div class="bar-row before">
-              <div class="bl"><b>Before</b><span>매뉴얼 배포 전 · 실측치</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
-              <div class="val">35건/월</div>
-              <div class="tag">23.3% 비중</div>
-            </div>
-            <div class="bar-row after">
-              <div class="bl"><b>After</b><span>Wiki 도입 후 · 목표치</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
-              <div class="val">24.5건/월</div>
-              <div class="tag">-30% 감축</div>
-            </div>
-            <div class="impact-notes">
-              <div class="impact-note"><b>사전 자가 점검 도구</b><p>사업부 담당자가 Wiki 가이드 및 체크리스트를 활용해 계정과목 적정성을 사전 자체 검증</p></div>
-              <div class="impact-note"><b>오류 예시 사전 차단</b><p>외주용역비 vs 지급수수료 계정 혼용 등 빈번한 반려 패턴을 실무 정산 가이드로 예방</p></div>
-            </div>
-          </div>
+      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>IMPACT 1 · 정량 성과</span><span class="corner-label">Before → After 비교</span></div>
+      <div class="slide-body">
+        <h1 class="slide-title" style="color:#fff">정량 성과</h1>
+        <div class="stat-row">
+          <div class="stat-tile"><span class="num">30%↓</span><h4>결재 반려건 감소</h4><p>회계기준 판단 오류 사전 예방으로 반려 및 수정 재처리를 절감합니다.</p></div>
+          <div class="stat-tile"><span class="num">30%↓</span><h4>단순 문의 감소</h4><p>반복 질의응답 최소화로 회계팀 업무 집중도를 향상시킵니다.</p></div>
+          <div class="stat-tile"><span class="num">40h/연</span><h4>업무 시간 절감</h4><p>문의 1건당 10분, 월 20건 기준 연간 40시간 소모 절감 효과입니다.</p></div>
         </div>
-        <div class="note-bar">산출 근거: 최근 1개월 결재 반려 150건 중 회계 오류 35건 기준이며, 분기별 재집계를 통해 목표 달성 여부 모니터링</div>
+        <div class="note-bar">매뉴얼 배포 전 실측 데이터(반려 150건, 문의 500명 대 8명 구조) 기준 — 분기별 재집계로 달성 여부 추적</div>
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">15 / 24</span>
-      </div>
-    </section>
-
-    <!-- 16. IMPACT 1 · 정량적 성과 ② 단순 문의 -->
-    <section class="slide section-dark">
-      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>IMPACT 1 · 정량적 성과 ②</span><span class="corner-label">Before → After 비교</span></div>
-      <div class="slide-body" style="--stat-c:#60A5FA">
-        <h1 class="slide-title">반복 질의응답 최소화로 단순 문의량 <span style="color:var(--stat-c)">30%</span> 감축</h1>
-        <div class="impact-grid">
-          <div class="impact-hero">
-            <span class="lbl">단순 문의량 감축 목표</span>
-            <span class="num">30%↓</span>
-            <span class="sub">일 100건 ➔ 70건 (-30건/일)</span>
-            <span class="desc">구두 및 메일/메신저로 파편화되어 오던 반복 문의를 Wiki 자율 조회 방식으로 일원화하여 단순 문의 인바운드를 감소시킵니다.</span>
-          </div>
-          <div class="impact-chart">
-            <div class="impact-chart-title">회계팀 일일 단순 질의 수신 건수 비교 (Before vs After)</div>
-            <div class="bar-row before">
-              <div class="bl"><b>Before</b><span>구두/메신저 응대<br>개별 질의</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
-              <div class="val">100건/일</div>
-              <div class="tag">팀 전체 수신</div>
-            </div>
-            <div class="bar-row after">
-              <div class="bl"><b>After</b><span>Wiki 셀프서비싱<br>자율 조회</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
-              <div class="val">70건/일</div>
-              <div class="tag">-30% 감축</div>
-            </div>
-            <div class="impact-notes">
-              <div class="impact-note"><b>10초 검색 체계</b><p>용어사전 및 실시간 환율 계산기를 제공하여 단순 사실확인성 문의 대폭 감소</p></div>
-              <div class="impact-note"><b>온보딩 모듈화</b><p>신규 입사자 온보딩 필수 가이드로 정립하여 반복적인 기초 문의 사전 예방</p></div>
-            </div>
-          </div>
-        </div>
-        <div class="note-bar">기대 효과: 잦은 질의 메신저 알림으로 인한 업무 흐름 단절을 방지하고 불필요한 소통 단계를 대폭 감소</div>
-      </div>
-      <div class="footer-bar">
-        <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">16 / 24</span>
-      </div>
-    </section>
-
-    <!-- 17. IMPACT 1 · 정량적 성과 ③ 업무 시간 절감 -->
-    <section class="slide section-dark">
-      <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>IMPACT 1 · 정량적 성과 ③</span><span class="corner-label">Before → After 비교</span></div>
-      <div class="slide-body" style="--stat-c:#FBBF24">
-        <h1 class="slide-title">연간 업무시간 절감 — 인당 <span style="color:var(--stat-c)">40h</span>, 팀 전체 320h 확보</h1>
-        <div class="impact-grid">
-          <div class="impact-hero">
-            <span class="lbl">1인당 연간 업무 절감 시간</span>
-            <span class="num">40h/연</span>
-            <span class="sub">회계팀 8명 전체: 연간 320시간 절감</span>
-            <span class="desc">문의 1건당 10분, 월 20건 감소 기준 1인당 연간 40시간의 순 업무 시간을 추가 확보합니다.</span>
-          </div>
-          <div class="impact-chart">
-            <div class="impact-chart-title">1인당 연간 단순 문의 소모 시간 변화 (Before vs After)</div>
-            <div class="bar-row before">
-              <div class="bl"><b>Before</b><span>기존 단순 문의<br>연간 소모시간</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
-              <div class="val">133.3시간</div>
-              <div class="tag">연간/인 기준</div>
-            </div>
-            <div class="bar-row after">
-              <div class="bl"><b>After</b><span>Wiki 도입 후<br>절감 후 소모시간</span></div>
-              <div class="bar-track"><div class="bar-fill" style="width:70%"></div></div>
-              <div class="val">93.3시간</div>
-              <div class="tag">-40시간 절감</div>
-            </div>
-            <div class="impact-notes">
-              <div class="impact-note"><b>고부가가치 업무 전환</b><p>절감된 320시간을 전략적 재무 분석, 세무 검증 및 회계 결산 검증 공수로 재투자</p></div>
-              <div class="impact-note"><b>인력 증원 대체 효과</b><p>약 0.2명의 풀타임 인력 증원 효과 및 업무 효율화에 따른 기회비용 절감 달성</p></div>
-            </div>
-          </div>
-        </div>
-        <div class="note-bar">산출 수식: [월 20건 감소 × 10분 = 200분/월] ➔ 연간 2,400분(40시간) / 회계팀 8명 전체 총 320시간 순공수 확보</div>
-      </div>
-      <div class="footer-bar">
-        <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">17 / 24</span>
+        <span class="footer-page">12 / 19</span>
       </div>
     </section>
 
@@ -873,11 +617,11 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">18 / 24</span>
+        <span class="footer-page">13 / 19</span>
       </div>
     </section>
 
-    <!-- 19. IMPACT 3 · 조직 리스크 -->
+    <!-- 14. IMPACT 3 · 조직 리스크 -->
     <section class="slide section-dark">
       <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>IMPACT 3 · 조직 리스크</span><span class="corner-label">인수인계 리스크 완화</span></div>
       <div class="slide-body">
@@ -904,11 +648,11 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">19 / 24</span>
+        <span class="footer-page">14 / 19</span>
       </div>
     </section>
 
-    <!-- 20. MESSAGE · 클로징 -->
+    <!-- 15. MESSAGE · 클로징 -->
     <section class="slide section-dark">
       <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>MESSAGE · 클로징</span><span class="corner-label"></span></div>
       <div class="slide-body">
@@ -924,11 +668,11 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">20 / 24</span>
+        <span class="footer-page">15 / 19</span>
       </div>
     </section>
 
-    <!-- 21. NEXT STEP · 후속 계획 -->
+    <!-- 16. NEXT STEP · 후속 계획 -->
     <section class="slide">
       <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>NEXT STEP · 후속 계획</span><span class="corner-label">후속 필요 사항 및 향후 계획</span></div>
       <div class="slide-body">
@@ -942,11 +686,11 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">21 / 24</span>
+        <span class="footer-page">16 / 19</span>
       </div>
     </section>
 
-    <!-- 22. LESSON · 배운 점 -->
+    <!-- 17. LESSON · 배운 점 -->
     <section class="slide">
       <div class="eyebrow-row"><span class="eyebrow"><span class="dot"></span>LESSON · 배운 점</span><span class="corner-label">배운 점 / 느낀 점</span></div>
       <div class="slide-body">
@@ -957,11 +701,11 @@
       </div>
       <div class="footer-bar">
         <div class="footer-logos"><img src="키다리스튜디오_로고_가로형.png" alt="키다리스튜디오"><span class="sep"></span><img src="레진_로고_가로형.png" alt="레진엔터테인먼트"></div>
-        <span class="footer-page">22 / 24</span>
+        <span class="footer-page">17 / 19</span>
       </div>
     </section>
 
-    <!-- 23. Q&A -->
+    <!-- 18. Q&A -->
     <section class="slide closing">
       <div class="slide-body">
         <span class="mark">Q &amp; A</span>
@@ -972,7 +716,7 @@
       </div>
     </section>
 
-    <!-- 24. 감사합니다 -->
+    <!-- 19. 감사합니다 -->
     <section class="slide closing">
       <div class="slide-body">
         <span class="mark">감사합니다</span>
