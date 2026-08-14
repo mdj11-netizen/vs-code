@@ -901,15 +901,16 @@ const DOCS = {
       <div class="card"><h3><span class="bar"></span>매출원가 카테고리</h3>
         <p style="font-size:13px">플랫폼(코인) 매출원가는 <strong>웹툰·소설 자사플랫폼</strong> 모두에 동일하게 적용되며, 크게 세 가지로 구성됩니다. 계정과목명의 "웹툰" 자리에 해당 콘텐츠명이 들어간다고 생각하시면 됩니다. 매출원가와 판매관리비의 구분 기준은 <strong>회계처리 유의사항</strong> 페이지를 참고하세요.</p>
         ${costCategoryFilter([
-          {id:'A', title:'콘텐츠·IP 원가', sub:'MG · RS 정산', icon:'content'},
+          {id:'A', title:'콘텐츠·IP 원가', sub:'MG · MG 외 계약 · RS 정산', icon:'content'},
           {id:'B', title:'제작·현지화 원가', sub:'외주용역 · 번역', icon:'production'},
           {id:'C', title:'결제 원가', sub:'PG 수수료', icon:'payment'},
         ], [
-          {cat:'A', item:'MG', expense:'서비스매출원가(웹툰플랫폼)_MG', asset:'선급비용', method:{label:'선급비용 경유', tone:'amber'}, detail:'costDetailMgAmort'},
-          {cat:'A', item:'RS 정산', expense:'서비스매출원가(웹툰플랫폼)_RS', asset:'-', method:{label:'즉시 인식', tone:'green'}, link:'platform/정산'},
-          {cat:'B', item:'외주용역', expense:'서비스매출원가(웹툰플랫폼)_외주용역', asset:'-', method:{label:'확인 필요', tone:'red'}},
-          {cat:'B', item:'번역', expense:'서비스매출원가(웹툰플랫폼)_번역', asset:'-', method:{label:'확인 필요', tone:'red'}},
-          {cat:'C', item:'PG 수수료', expense:'서비스매출원가(웹툰플랫폼)_PG수수료', asset:'-', method:{label:'즉시 인식', tone:'green'}, detail:'costDetailPgFee'},
+          {cat:'A', item:'MG', expense:'서비스매출원가(웹툰플랫폼)_MG', s2:['선급비용 선지급-소설(MG)','선급비용 선지급-웹툰MG (기간상각)'], method:{label:'선급비용 경유', tone:'amber'}, detail:'costDetailMgAmort'},
+          {cat:'A', item:'MG 외 계약', expense:'서비스매출원가(웹툰플랫폼)_기타', s2:['선급비용 선지급-웹툰보장인세 (내부)','선급비용 선지급-웹툰매절 (내부)','선급비용 선지급-웹툰인세 (내부)'], method:{label:'즉시 인식', tone:'green'}, detail:'costDetailMgOther'},
+          {cat:'A', item:'RS 정산', expense:'서비스매출원가(웹툰플랫폼)_RS', s2:['거래처대금지급(영상)','거래처대금지급(숏폼)'], method:{label:'즉시 인식', tone:'green'}, link:'platform/정산'},
+          {cat:'B', item:'외주용역', expense:'서비스매출원가(웹툰플랫폼)_외주용역', method:{label:'즉시 인식', tone:'green'}},
+          {cat:'B', item:'번역', expense:'서비스매출원가(웹툰플랫폼)_번역', method:{label:'즉시 인식', tone:'green'}},
+          {cat:'C', item:'PG 수수료', expense:'서비스매출원가(웹툰플랫폼)_PG수수료', method:{label:'즉시 인식', tone:'green'}, detail:'costDetailPgFee'},
         ])}
 
         <div id="costDetailMgAmort" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
@@ -924,6 +925,18 @@ const DOCS = {
           {id:'service', title:'서비스 24개월간', sub:'매월 균등상각', role:'company'},
         ])}
         <p style="margin-top:10px;font-size:12px;color:var(--gray-5)">💡 박스를 클릭하면 아래 상세가 바뀝니다.</p>
+      </div>
+
+        <div id="costDetailMgOther" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
+      <h3><span class="bar"></span>MG 외 계약 상세 — 보장인세·매절·인세</h3>
+        <p>MG 외 계약은 <strong>보장인세·매절·인세</strong> 세 가지 세부 유형으로 나뉩니다. 정산항목명에 "선급비용"이 들어가지만, 실제 계정분류는 자산화(선급비용 처리) 없이 회차별로 <strong>서비스매출원가로 즉시 비용 처리</strong>합니다.</p>
+        <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
+          ${jrow(['서비스매출원가(웹툰플랫폼)_기타','100'],['미지급금-거래처','100'])}</table>
+        ${exampleBlock([
+          {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-웹툰보장인세 (내부)'},
+          {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-웹툰매절 (내부)'},
+          {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-웹툰인세 (내부)'},
+        ], 0)}
       </div>
 
         <div id="costDetailPgFee" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
@@ -1007,7 +1020,13 @@ const DOCS = {
         <p style="font-size:13px">아래 항목은 매출로 이어지지 않는 지출이라 위 매출원가 카테고리에 넣지 않고, <strong>지급수수료(판매관리비 성격)</strong>로 즉시 비용 처리합니다. 유통 매출원가 페이지와 동일한 기준입니다.</p>
         <table style="margin-top:12px"><tr><th>항목</th><th>계정과목</th><th>인식 방식</th></tr>
           <tr><td><strong>MG무관 샘플비용</strong></td><td>지급수수료</td><td><span class="chip green">즉시 인식</span></td></tr></table>
-        <p style="margin-top:10px"><span class="jump-link" onclick="openDoc('dist/매출 원가')">→ 유통 매출원가에서 상세 예시 보기</span></p>
+
+        <div style="border-top:1px solid var(--gray-2);margin:18px 0 0;padding-top:18px">
+          ${subHead('분개 예시')}
+          <p style="font-size:13px">MG와 무관한 샘플비용, 타이틀·표지 제작비 등은 자산화 없이 발생 시 바로 비용으로 처리합니다. 매출로 이어지지 않는 지출이라 정식 원가(매출원가)가 아니라 지급수수료로 잡고, MG 상각 대상에도 포함하지 않습니다.</p>
+          <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
+            ${jrow(['지급수수료','50만원'],['미지급금-거래처','50만원'])}</table>
+        </div>
       </div>
       `
   },
@@ -1269,30 +1288,15 @@ const DOCS = {
       <div class="card"><h3><span class="bar"></span>매출원가 카테고리</h3>
         <p style="font-size:13px">콘텐츠 유형(웹툰·소설·영상·IP 등)에 관계없이 동일한 방식이 적용됩니다. 계정과목명의 "웹툰" 자리에 해당 콘텐츠명이 들어간다고 생각하시면 됩니다. 매출원가와 판매관리비의 구분 기준은 <strong>회계처리 유의사항</strong> 페이지를 참고하세요.</p>
         ${costCategoryFilter([
-          {id:'A', title:'콘텐츠·IP 원가', sub:'MG · RS 정산 · 어시비용', icon:'content'},
+          {id:'A', title:'콘텐츠·IP 원가', sub:'MG · MG 외 계약 · RS · 어시비용', icon:'content'},
           {id:'B', title:'제작·현지화 원가', sub:'외주용역 · 번역', icon:'production'},
         ], [
-          {cat:'A', item:'MG', expense:'서비스매출원가(외부플랫폼)-웹툰_MG(회차인식)', asset:'선급비용 선지급-MG(진행률상각)', method:{label:'선급비용 경유', tone:'amber'}, detail:'costDetailMg'},
-          {cat:'A', item:'RS 정산(매절)', expense:'서비스매출원가', asset:'-', method:{label:'즉시 인식', tone:'green'}, detail:'costDetailMaejeol'},
-          {cat:'A', item:'MG포함 어시비용', expense:'서비스매출원가(외부플랫폼)', asset:'선급비용-MG(진행률상각)_외주용역', method:{label:'선급비용 경유', tone:'amber'}, detail:'costDetailAssist'},
-          {cat:'B', item:'MG미포함 어시·제작비(외주용역·번역)', expense:'서비스매출원가(외부플랫폼)_외주용역', asset:'-', method:{label:'즉시 인식', tone:'green'}, detail:'costDetailOutsource'},
+          {cat:'A', item:'MG', expense:['서비스매출원가(외부플랫폼)-소설_인세(회차인식)','서비스매출원가(외부플랫폼)-웹툰_MG(회차인식)','서비스매출원가(외부플랫폼)-숏폼콘텐츠_MG'], s2:['선급비용 선지급-소설(MG)','선급비용 선지급-웹툰MG (진행률상각)','선급비용 선지급-숏폼콘텐츠MG'], method:{label:'선급비용 경유', tone:'amber'}, detail:'costDetailMg'},
+          {cat:'A', item:'MG 외 계약', expense:'서비스매출원가(외부플랫폼)_기타', s2:['선급비용 선지급-소설(보장인세)','선급비용 선지급-웹툰보장인세 (외부)','선급비용 선지급-웹툰매절 (외부)','선급비용 선지급-웹툰인세 (외부)'], method:{label:'즉시 인식', tone:'green'}, detail:'costDetailMaejeol'},
+          {cat:'A', item:'RS', expense:['서비스매출원가(외부플랫폼)-소설_RS','서비스매출원가(외부플랫폼)-웹툰_RS'], s2:['거래처대금지급(소설)','거래처대금지급(웹툰)'], method:{label:'즉시 인식', tone:'green'}, link:'dist/정산'},
+          {cat:'A', item:'MG포함 어시비용', expense:'선급비용-MG(진행률상각)_외주용역', method:{label:'선급비용 경유', tone:'amber'}, detail:'costDetailAssist'},
+          {cat:'B', item:'MG미포함 어시·제작비(외주용역·번역)', expense:'서비스매출원가(외부플랫폼)_외주용역', method:{label:'즉시 인식', tone:'green'}, detail:'costDetailOutsource'},
         ])}
-
-        <button class="s2-toggle" onclick="toggleS2(this)"><span class="s2-chevron">▶</span>콘텐츠·IP 원가 — 계약금·보장인세·인세 등 그 외 즉시 비용처리 항목(RS 정산)</button>
-        <div class="s2-items" style="display:none">
-          <p style="font-size:13px">위 표에 없는 <strong>계약금, 보장인세, 인세</strong> 등도 자산화(선급비용 처리) 없이 회차별로 즉시 비용 처리합니다.</p>
-          <table style="table-layout:fixed;margin-top:8px"><tr><th style="width:50%">차변</th><th style="width:50%">대변</th></tr>
-            ${jrow(['서비스매출원가','100만원'],['미지급금-거래처','100만원'])}</table>
-          ${exampleBlock([
-            {codeName:'선급비용 선 지급', itemName:'소설 · 보장인세'},
-            {codeName:'선급비용 선 지급', itemName:'봄툰소설 · 계약금'},
-            {codeName:'선급비용 선 지급', itemName:'소설 · 계약금'},
-            {codeName:'선급비용 선 지급', itemName:'웹툰보장인세 · 내부'},
-            {codeName:'선급비용 선 지급', itemName:'웹툰보장인세 · 외부'},
-            {codeName:'선급비용 선 지급', itemName:'웹툰인세 · 내부'},
-            {codeName:'선급비용 선 지급', itemName:'웹툰인세 · 외부'},
-          ], 0)}
-        </div>
 
         <div id="costDetailMg" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
           ${subHead('MG 지급건 상세 — 콘텐츠 유형별 상각 방식')}
@@ -1348,14 +1352,15 @@ const DOCS = {
         </div>
 
         <div id="costDetailMaejeol" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
-          ${subHead('RS 정산(매절) 상세')}
-          <p style="font-size:13px">RS 실적정산은 <strong>매절·보장인세·인세</strong> 세 가지 세부 유형으로 나뉩니다. 정산항목명에 "선급비용"이 들어가지만, 실제 계정분류는 자산화(선급비용 처리) 없이 회차별로 <strong>서비스매출원가로 즉시 비용 처리</strong>합니다.</p>
+          ${subHead('MG 외 계약 상세 — 보장인세·매절·인세')}
+          <p style="font-size:13px">MG 외 계약은 콘텐츠·계약 유형에 따라 <strong>보장인세·매절·인세</strong> 등으로 나뉩니다. 정산항목명에 "선급비용"이 들어가지만, 실제 계정분류는 자산화(선급비용 처리) 없이 회차별로 <strong>서비스매출원가(외부플랫폼)_기타로 즉시 비용 처리</strong>합니다.</p>
           <table style="table-layout:fixed;margin-top:12px"><tr><th style="width:50%">차변</th><th style="width:50%">대변</th></tr>
-            ${jrow(['서비스매출원가','100만원'],['미지급금-거래처','100만원'])}</table>
+            ${jrow(['서비스매출원가(외부플랫폼)_기타','100만원'],['미지급금-거래처','100만원'])}</table>
           ${exampleBlock([
-            {codeName:'선급비용 선 지급', itemName:'소설 · 매절'},
-            {codeName:'선급비용 선 지급', itemName:'웹툰매절 · 내부'},
-            {codeName:'선급비용 선 지급', itemName:'웹툰매절 · 외부'},
+            {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-소설(보장인세)'},
+            {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-웹툰보장인세 (외부)'},
+            {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-웹툰매절 (외부)'},
+            {codeName:'선급비용 선 지급', itemName:'선급비용 선지급-웹툰인세 (외부)'},
           ], 0)}
         </div>
 
@@ -1385,13 +1390,26 @@ const DOCS = {
       <div class="card"><h3><span class="bar"></span>참고 — 매출원가가 아닌 지급수수료 항목</h3>
         <p style="font-size:13px">아래 항목은 매출로 이어지지 않는 지출이라 위 매출원가 카테고리에 넣지 않고, <strong>지급수수료(판매관리비 성격)</strong>로 즉시 비용 처리합니다.</p>
         <table style="margin-top:12px"><tr><th>항목</th><th>계정과목</th><th>상신 경로</th><th>인식 방식</th></tr>
-          <tr class="row-toggle" onclick="toggleRowDetail(this,'costDetailSample')"><td><strong>MG무관 샘플비용</strong><span class="row-toggle-hint">▾ 상세보기</span></td><td>지급수수료</td><td>ERP 전표입력</td><td><span class="chip green">즉시 인식</span></td></tr></table>
+          <tr class="row-toggle" onclick="toggleRowDetail(this,'costDetailSample')"><td><strong>MG무관 샘플비용</strong><span class="row-toggle-hint">▾ 상세보기</span></td><td>지급수수료</td><td>ERP 전표입력</td><td><span class="chip green">즉시 인식</span></td></tr>
+          <tr class="row-toggle" onclick="toggleRowDetail(this,'costDetailSampleConvert')"><td><strong>샘플테스트 통과 후 본계약시 MG에 포함되는 샘플비용</strong><span class="row-toggle-hint">▾ 상세보기</span></td><td>지급수수료</td><td>ERP 전표입력</td><td><span class="chip green">즉시 인식</span></td></tr></table>
 
         <div id="costDetailSample" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
           ${subHead('MG무관 샘플비용 상세')}
           <p style="font-size:13px">MG와 무관한 샘플비용, 타이틀·표지 제작비 등은 자산화 없이 발생 시 바로 비용으로 처리합니다. 매출로 이어지지 않는 지출이라 정식 원가(매출원가)가 아니라 지급수수료로 잡고, MG 상각 대상에도 포함하지 않습니다.</p>
           <table style="table-layout:fixed;margin-top:12px"><tr><th style="width:50%">차변</th><th style="width:50%">대변</th></tr>
             ${jrow(['지급수수료','50만원'],['미지급금-거래처','50만원'])}</table>
+        </div>
+
+        <div id="costDetailSampleConvert" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
+          ${subHead('샘플테스트 통과 후 본계약시 MG 포함 샘플비용 상세')}
+          <p style="font-size:13px">샘플테스트 단계에서는 MG무관 샘플비용과 동일하게 <strong>지급수수료</strong>로 즉시 비용 처리합니다. 다만 이후 <strong>본계약이 체결되어 해당 샘플비용이 MG에 포함되는 경우</strong>, 본계약 통과 시점에 지급수수료를 선급비용으로 대체합니다.</p>
+          <p style="margin-top:10px"><span class="ex-badge">예시</span>샘플테스트 통과 시 지급수수료 100만원 계상</p>
+          <table style="table-layout:fixed;margin-top:8px"><tr><th style="width:50%">차변</th><th style="width:50%">대변</th></tr>
+            ${jrow(['지급수수료','100만원'],['미지급금-거래처','100만원'])}</table>
+          <p style="margin-top:16px;font-size:13px"><span class="ex-badge">예시</span>본계약 통과 시 지급수수료 → 선급비용 대체</p>
+          <table style="table-layout:fixed;margin-top:8px"><tr><th style="width:50%">차변</th><th style="width:50%">대변</th></tr>
+            ${jrow(['선급비용-MG(진행률상각)_외주용역','100만원'],['지급수수료','100만원'])}</table>
+          <div class="callout" style="margin-top:14px"><span class="ic">⚠️</span><p>대체 전표 작성과 동시에 <strong>매출정산시스템(S2)에도 등록</strong>해야 이후 MG 진행률 상각에 반영됩니다.</p></div>
         </div>
       </div>`
   },
@@ -1958,27 +1976,78 @@ const DOCS = {
           {id:'B', title:'제작 원가', sub:'순제작비 · 번역', icon:'production'},
           {id:'C', title:'결제 원가', sub:'PG 수수료', icon:'payment'},
         ], [
-          {cat:'A', item:'MG', expense:'서비스매출원가(숏폼플랫폼)_MG', asset:'선급비용', method:{label:'선급비용 경유', tone:'amber'}, link:'platform/매출 원가'},
-          {cat:'A', item:'RS 정산', expense:'서비스매출원가(숏폼플랫폼)_RS', asset:'-', method:{label:'즉시 인식', tone:'green'}, link:'snack/정산'},
-          {cat:'A', item:'원작료 / IP', expense:'서비스매출원가(숏폼플랫폼)_제작비', asset:'선급금-영상(원작/시나리오)', method:{label:'선급금 경유', tone:'amber'}, detail:'costDetailSnackProduction'},
-          {cat:'B', item:'순제작비', expense:'서비스매출원가(숏폼플랫폼)_제작비', asset:'선급금-영상(순제작비)', method:{label:'선급금 경유', tone:'amber'}, detail:'costDetailSnackProduction'},
-          {cat:'B', item:'번역', expense:'서비스매출원가(숏폼플랫폼)_번역', asset:'-', method:{label:'확인 필요', tone:'red'}},
-          {cat:'C', item:'PG 수수료', expense:'서비스매출원가(숏폼플랫폼)_PG수수료', asset:'-', method:{label:'즉시 인식', tone:'green'}},
+          {cat:'A', item:'MG', expense:'서비스매출원가(숏폼플랫폼)_MG', s2:['선급비용 선지급-숏폼콘텐츠MG'], method:{label:'선급비용 경유', tone:'amber'}, link:'platform/매출 원가'},
+          {cat:'A', item:'RS 정산', expense:'서비스매출원가(숏폼플랫폼)_RS', s2:['거래처대금지급(숏폼)'], method:{label:'즉시 인식', tone:'green'}, link:'snack/정산'},
+          {cat:'A', item:'원작료 / IP', expense:'서비스매출원가(숏폼플랫폼)_제작비', s2:['선급금-영상(원작/시나리오)'], method:{label:'선급금 경유', tone:'amber'}, detail:'costDetailSnackScript'},
+          {cat:'B', item:'순제작비', expense:'서비스매출원가(숏폼플랫폼)_제작비', s2:['선급금-영상(순제작비)'], method:{label:'선급금 경유', tone:'amber'}, detail:'costDetailSnackProduction'},
+          {cat:'B', item:'번역', expense:'서비스매출원가(숏폼플랫폼)_번역', method:{label:'즉시 인식', tone:'green'}},
+          {cat:'C', item:'PG 수수료', expense:'서비스매출원가(숏폼플랫폼)_PG수수료', method:{label:'즉시 인식', tone:'green'}},
         ])}
 
-        <div class="callout" style="margin-top:16px">
+        <div class="callout" data-cat-only="A" style="margin-top:16px">
           <span class="ic">⚠️</span>
           <p>MG 상각은 <strong>플랫폼과 동일한 방식</strong>으로 처리합니다 — 지급 당월에 비용 처리하지 않고 선급비용(자산)으로 먼저 계상한 뒤, 서비스 기간에 걸쳐 나누어 상각합니다.</p>
         </div>
 
         <div id="costDetailSnackProduction" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
-          ${subHead('오픈 시점 — 선급금의 비용 전환')}
-          <p style="font-size:13px">레진스낵은 제작비 일부를 <strong>외부 펀드 자금</strong>으로 조달합니다. 선급금으로 쌓아둔 순제작비·원작료는 <strong>작품 오픈 시점에 비용으로 전환</strong>합니다.</p>
-          <p style="margin-top:8px;font-size:12px;color:var(--gray-5)">순제작비·원작료 선급금 모두 서비스매출원가(숏폼플랫폼)_제작비로 전환됩니다.</p>
-          <p style="margin-top:16px;font-size:13px"><span class="ex-badge">예시</span>순제작비 30,000,000원 선지급</p>
-          <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
-            ${jrow(['선급금-영상(순제작비)','30,000,000'],['미지급금-거래처','30,000,000'])}</table>
-        </div>
+      <h3><span class="bar"></span>순제작비 — 선급금 6개월 상각</h3>
+        <p>레진스낵은 제작비 일부를 <strong>외부 펀드 자금</strong>으로 조달합니다. 선급금으로 먼저 계상한 순제작비는 지급 당월에 바로 비용 처리하지 않고, <strong>작품이 오픈하는 시점부터 6개월간 균등 상각</strong>하여 서비스매출원가(숏폼플랫폼)_제작비로 반영합니다.</p>
+        <p style="margin-top:6px;font-size:12.5px;color:var(--gray-5)">순제작비 선지급 → 작품 오픈(Open) → 6개월 서비스 기간 동안의 상각 순서로 진행됩니다.</p>
+        ${moneyDiagram([
+          {id:'snackProdPay', title:'순제작비 선지급', sub:'선급금 계상', role:'external'},
+          {id:'snackProdOpen', title:'작품 오픈(Open)', sub:'상각 개시', role:'company'},
+          {id:'snackProdAmort', title:'서비스 6개월간', sub:'매월 균등상각', role:'company'},
+        ])}
+        <p style="margin-top:10px;font-size:12px;color:var(--gray-5)">💡 박스를 클릭하면 아래 상세가 바뀝니다.</p>
+      </div>
+
+        <div id="costDetailSnackScript" class="row-detail" style="display:none;border-top:1px solid var(--gray-2);margin-top:20px;padding-top:20px">
+      <h3><span class="bar"></span>원작료 / IP — 선급금 6개월 상각</h3>
+        <p>원작료(원작/시나리오 판권 등)도 순제작비와 <strong>동일한 방식</strong>으로, 지급 시점에는 선급금(자산)으로 먼저 계상하고 <strong>작품이 오픈하는 시점부터 6개월간 균등 상각</strong>하여 서비스매출원가(숏폼플랫폼)_제작비로 반영합니다.</p>
+        <p style="margin-top:6px;font-size:12.5px;color:var(--gray-5)">원작료 선지급 → 작품 오픈(Open) → 6개월 서비스 기간 동안의 상각 순서로 진행됩니다.</p>
+        ${moneyDiagram([
+          {id:'snackScriptPay', title:'원작료 선지급', sub:'선급금 계상', role:'external'},
+          {id:'snackScriptOpen', title:'작품 오픈(Open)', sub:'상각 개시', role:'company'},
+          {id:'snackScriptAmort', title:'서비스 6개월간', sub:'매월 균등상각', role:'company'},
+        ])}
+        <p style="margin-top:10px;font-size:12px;color:var(--gray-5)">💡 박스를 클릭하면 아래 상세가 바뀝니다.</p>
+      </div>
+      </div>
+
+      <div class="card step-detail" data-step="snackProdPay" style="display:none"><h3><span class="bar"></span>순제작비 선지급 — 선급금 계상</h3>
+        <p>선급금(자산)으로 처리한 뒤, 작품이 오픈하는 시점부터 <strong>6개월간 균등 상각</strong>하여 서비스매출원가(비용)로 반영합니다.</p>
+        <p style="margin-top:10px"><span class="ex-badge">예시</span>순제작비 60,000,000원(6개월분) 선급금 계상</p>
+        <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
+          ${jrow(['선급금-영상(순제작비)','60,000,000'],['미지급금-거래처','60,000,000'])}</table>
+      </div>
+
+      <div class="card step-detail" data-step="snackProdOpen" style="display:none"><h3><span class="bar"></span>작품 오픈(Open) — 원가 전환 시작</h3>
+        <p>작품이 오픈하는 시점부터 선급금으로 잡아둔 순제작비가 서비스매출원가로 전환되기 시작합니다. 오픈 전에는 상각이 발생하지 않습니다.</p>
+      </div>
+
+      <div class="card step-detail" data-step="snackProdAmort" style="display:none"><h3><span class="bar"></span>서비스 6개월간 — 매월 상각</h3>
+        <p>오픈 시점부터 6개월간 균등 상각(1/6씩)하여 서비스매출원가로 반영합니다.</p>
+        <p style="margin-top:10px"><span class="ex-badge">예시</span>순제작비 월 상각(1/6) 10,000,000원</p>
+        <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
+          ${jrow(['서비스매출원가(숏폼플랫폼)_제작비','10,000,000'],['선급금-영상(순제작비)','10,000,000'])}</table>
+      </div>
+
+      <div class="card step-detail" data-step="snackScriptPay" style="display:none"><h3><span class="bar"></span>원작료 선지급 — 선급금 계상</h3>
+        <p>선급금(자산)으로 처리한 뒤, 작품이 오픈하는 시점부터 <strong>6개월간 균등 상각</strong>하여 서비스매출원가(비용)로 반영합니다.</p>
+        <p style="margin-top:10px"><span class="ex-badge">예시</span>원작료 6,000,000원(6개월분) 선급금 계상</p>
+        <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
+          ${jrow(['선급금-영상(원작/시나리오)','6,000,000'],['미지급금-거래처','6,000,000'])}</table>
+      </div>
+
+      <div class="card step-detail" data-step="snackScriptOpen" style="display:none"><h3><span class="bar"></span>작품 오픈(Open) — 원가 전환 시작</h3>
+        <p>작품이 오픈하는 시점부터 선급금으로 잡아둔 원작료가 서비스매출원가로 전환되기 시작합니다. 오픈 전에는 상각이 발생하지 않습니다.</p>
+      </div>
+
+      <div class="card step-detail" data-step="snackScriptAmort" style="display:none"><h3><span class="bar"></span>서비스 6개월간 — 매월 상각</h3>
+        <p>오픈 시점부터 6개월간 균등 상각(1/6씩)하여 서비스매출원가로 반영합니다.</p>
+        <p style="margin-top:10px"><span class="ex-badge">예시</span>원작료 월 상각(1/6) 1,000,000원</p>
+        <table class="jn-table" style="margin-top:8px"><tr><th>차변</th><th>대변</th></tr>
+          ${jrow(['서비스매출원가(숏폼플랫폼)_제작비','1,000,000'],['선급금-영상(원작/시나리오)','1,000,000'])}</table>
       </div>
 
       <div class="card"><h3><span class="bar"></span>참고 — 자금조달·홍보비</h3>
@@ -3676,12 +3745,16 @@ function subHead(text){
 // 매출원가 항목을 카테고리 카드(2단계)로 나눠 보여주고, 카드를 누르면 아래 상세 테이블(3단계)이
 // 그 카테고리 행만 남기고 필터링되는 컴포넌트 — 유형별 "매출 원가" 페이지에서 공통으로 쓴다.
 // categories: [{id, title, sub, icon:'content'|'production'|'payment'}]
-// rows: [{cat, item, expense, asset, method:{label, tone}, path, detail?}] — method.tone은 새
+// rows: [{cat, item, expense, s2, method:{label, tone}, link, detail?}] — method.tone은 새
 // 색 없이 기존 .chip 팔레트(amber=선급비용 경유, green=즉시 인식, red=확인 필요)를 그대로
-// 재사용한다. detail(있으면)은 toggleRowDetail로 펼치는 기존 id="row-detail" 블록과 그대로
-// 연결한다(항목 셀에 row-toggle 힌트를 붙인다). 카드를 다시 누르면 필터가 풀리고 전체 행이
-// 다시 보인다(filterCostCategory 참고). DOCS가 이 함수를 스크립트 위쪽에서 즉시 호출하므로,
-// 아이콘 3종(콘텐츠/제작/결제)도 moneyDiagram의 색상표와 같은 이유로 함수 안에 둔다.
+// 재사용한다. expense는 보통 문자열 하나(계정과목 1개에 S2 여러 건이 딸림, rowspan)지만,
+// MG처럼 콘텐츠 유형별로 계정과목 자체가 달라지는 경우 s2와 같은 길이의 배열로 넘기면
+// 계정과목도 S2와 함께 한 줄씩 나란히 나간다(rowspan 없음). detail(있으면)은 toggleRowDetail로
+// 펼치는 기존 id="row-detail" 블록과 연결하는데, 클릭 토글은 항목/계정과목/인식방식이 있는
+// 첫 줄에만 걸어서 S2 정산항목명만 있는 나머지 줄은 클릭되지 않게 한다(항목 셀에 row-toggle
+// 힌트를 붙인다). 카드를 다시 누르면 필터가 풀리고 전체 행이 다시 보인다(filterCostCategory
+// 참고). DOCS가 이 함수를 스크립트 위쪽에서 즉시 호출하므로, 아이콘 3종(콘텐츠/제작/결제)도
+// moneyDiagram의 색상표와 같은 이유로 함수 안에 둔다.
 function costCategoryFilter(categories, rows){
   const ICONS = {
     content: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>',
@@ -3697,23 +3770,39 @@ function costCategoryFilter(categories, rows){
   const body = rows.map(r => {
     // detail(있으면) 상세보기 토글, link(있으면) 다른 문서로 바로 이동 — 둘 다 없으면 그냥
     // 참고용 텍스트 행(예: 아직 계정과목이 확인되지 않은 항목).
+    // s2(있으면) 정산항목명 여러 건을 행 분리 + rowspan으로 펼친다. S2 정산항목명이 없는
+    // 항목(예: RS·외주용역·번역처럼 선급비용을 거치지 않는 항목)은 '-' 한 줄로 표시한다.
+    // 상신 경로는 별도 필드로 관리하지 않고 S2 정산항목명 유무로 그때그때 도출한다 —
+    // "S2 정산항목명이 있으면 매출정산시스템(S2), 없으면 ERP 전표입력"이라는 규칙이 지금까지
+    // 확인된 사례(MG·MG 외 계약·RS는 S2, MG포함 어시비용·외주용역·번역·PG수수료는 ERP)에
+    // 전부 들어맞기 때문. 예외가 확인되면 그때 행별 override 필드를 추가한다.
     const hint = r.detail ? `<span class="row-toggle-hint">▾ 상세보기</span>`
       : r.link ? `<button class="jump-link" style="font-size:11px;font-weight:700;background:none;border:none;padding:0;cursor:pointer;margin-left:6px" onclick="openDoc('${r.link}')">→ 이동</button>` : '';
-    return `
-        <tr data-cat="${r.cat}" ${r.detail ? `class="row-toggle" onclick="toggleRowDetail(this,'${r.detail}')"` : ''}>
-          <td><strong>${r.item}</strong>${hint}</td>
-          <td>${r.expense}</td>
-          <td><span class="chip ${r.method.tone}">${r.method.label}</span></td>
-          <td>${r.asset}</td>
-        </tr>`;
+    const s2List = r.s2 && r.s2.length ? r.s2 : ['-'];
+    const span = s2List.length;
+    const expenseList = Array.isArray(r.expense) ? r.expense : null;
+    const channel = 'channel' in r ? r.channel : (r.s2 && r.s2.length ? '매출정산시스템(S2)' : 'ERP 전표입력');
+    const toggleAttr = r.detail ? ` class="row-toggle" onclick="toggleRowDetail(this,'${r.detail}')"` : '';
+    return s2List.map((s2, i) => i === 0 ? `
+        <tr data-cat="${r.cat}"${toggleAttr}>
+          <td rowspan="${span}"><strong>${r.item}</strong>${hint}</td>
+          <td${expenseList ? '' : ` rowspan="${span}"`}>${expenseList ? expenseList[i] : r.expense}</td>
+          <td style="cursor:default" onclick="event.stopPropagation()">${s2}</td>
+          <td rowspan="${span}">${channel}</td>
+          <td rowspan="${span}"><span class="chip ${r.method.tone}">${r.method.label}</span></td>
+        </tr>` : `
+        <tr data-cat="${r.cat}">
+          ${expenseList ? `<td>${expenseList[i]}</td>` : ''}
+          <td>${s2}</td>
+        </tr>`).join('');
   }).join('');
   return `
       <div class="cost-cat-wrap">
         <div class="cost-cat-cards">${cards}</div>
         <p style="font-size:12px;color:var(--gray-5);margin-top:10px">카테고리를 누르면 아래 표가 그 항목만 남고 필터링됩니다. 다시 누르면 전체 보기로 돌아갑니다.</p>
         <table style="margin-top:14px;table-layout:fixed">
-          <colgroup><col style="width:26%"><col style="width:32%"><col style="width:16%"><col style="width:26%"></colgroup>
-          <tr><th>항목</th><th>계정과목(매출원가)</th><th>인식방식</th><th>자산경유 계정</th></tr>${body}</table>
+          <colgroup><col style="width:15%"><col style="width:21%"><col style="width:31%"><col style="width:17%"><col style="width:16%"></colgroup>
+          <tr><th>항목</th><th>계정과목(ERP)</th><th>S2 정산항목명</th><th>상신 경로</th><th>인식방식</th></tr>${body}</table>
       </div>`;
 }
 
@@ -3729,15 +3818,24 @@ function openDocCat(key, catId){
 function filterCostCategory(btn, catId){
   const wrap = btn.closest('.cost-cat-wrap');
   const table = wrap.querySelector('table');
+  // data-cat-only가 붙은 카드 밖 콜아웃(예: 레진스낵의 "MG 상각은 플랫폼과 동일" 안내)도
+  // 표 필터와 같이 켜고 끈다 — 콜아웃은 cost-cat-wrap 밖(같은 .card 안)에 있어서 스코프를
+  // 넓게 잡는다.
+  const scope = btn.closest('.card') || wrap;
+  const callouts = scope.querySelectorAll('[data-cat-only]');
   if(btn.classList.contains('on')){
     btn.classList.remove('on');
     table.querySelectorAll('tr[data-cat]').forEach(tr=>tr.style.display='');
+    callouts.forEach(el=>el.style.display='');
     return;
   }
   wrap.querySelectorAll('.cost-cat-card').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   table.querySelectorAll('tr[data-cat]').forEach(tr=>{
     tr.style.display = tr.dataset.cat===catId ? '' : 'none';
+  });
+  callouts.forEach(el=>{
+    el.style.display = el.dataset.catOnly === catId ? '' : 'none';
   });
 }
 
