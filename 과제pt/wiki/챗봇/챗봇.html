@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회계·세무 Wiki Q&A</title>
+<style>
+:root{
+  --font:-apple-system,BlinkMacSystemFont,'Pretendard','Apple SD Gothic Neo','Segoe UI',sans-serif;
+  --blue:#3182F6; --blue-weak:#E8F3FF; --blue-deep:#1B64DA;
+  --teal:#0694A2; --teal-weak:#E1F7F5; --teal-deep:#057A85;
+  --coral:#F0654A; --coral-weak:#FFEEE9; --coral-deep:#D9472E;
+  --ink:#191F28; --gray-9:#333D4B; --gray-7:#4E5968; --gray-6:#6B7684;
+  --gray-5:#8B95A1; --gray-4:#B0B8C1; --gray-3:#D1D6DB; --gray-2:#E5E8EB;
+  --gray-1:#F2F4F6; --gray-05:#F9FAFB; --white:#fff;
+  --radius:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);color:var(--ink);background:var(--gray-1);height:100vh;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+
+.topbar{height:56px;background:var(--white);border-bottom:1px solid var(--gray-2);display:flex;align-items:center;gap:10px;padding:0 20px;flex-shrink:0}
+.topbar .icon{width:30px;height:30px;border-radius:9px;background:var(--blue-weak);color:var(--blue-deep);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:.12s}
+.topbar .icon:hover{background:var(--blue);color:var(--white)}
+.topbar .title{font-size:15px;font-weight:800}
+.topbar .sub{font-size:11.5px;color:var(--gray-5);font-weight:600}
+
+.chat-area{flex:1;overflow-y:auto;padding:24px 0}
+.chat-area::-webkit-scrollbar{width:8px}
+.chat-area::-webkit-scrollbar-thumb{background:var(--gray-3);border-radius:8px}
+.chat-inner{max-width:720px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:16px}
+
+.empty{margin-top:60px;text-align:center;color:var(--gray-5)}
+.empty .icon{width:52px;height:52px;border-radius:16px;background:var(--blue-weak);color:var(--blue-deep);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.empty .t1{font-size:15px;font-weight:700;color:var(--gray-9);margin-bottom:6px}
+.empty .t2{font-size:13px;line-height:1.6}
+.suggest-list{margin-top:20px;display:flex;flex-direction:column;gap:8px;max-width:420px;margin-left:auto;margin-right:auto}
+.suggest-item{background:var(--white);border:1px solid var(--gray-2);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--gray-7);text-align:left;cursor:pointer;transition:.12s}
+.suggest-item:hover{background:var(--gray-05);border-color:var(--gray-3)}
+
+.msg{display:flex;gap:10px;max-width:100%}
+.msg.qa-user{justify-content:flex-end}
+.bubble{border-radius:14px;padding:12px 16px;font-size:14px;line-height:1.65;white-space:pre-wrap}
+.msg.qa-user .bubble{background:var(--blue) !important;color:var(--white);border:none !important;outline:none !important;box-shadow:none !important;-webkit-box-shadow:none !important;filter:none !important;border-bottom-right-radius:4px;max-width:70%}
+.msg.qa-bot .bubble{background:var(--white);border:1px solid var(--gray-2);color:var(--ink);border-bottom-left-radius:4px;max-width:100%;box-shadow:var(--shadow)}
+.msg.qa-bot .avatar{width:30px;height:30px;border-radius:9px;background:var(--teal-weak);color:var(--teal-deep);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+.bubble.notfound{background:var(--gray-05);border-color:var(--gray-2);color:var(--gray-6)}
+.bubble .ans-line{margin-bottom:6px}
+.bubble .ans-line:last-child{margin-bottom:0}
+.bubble .ans-label{font-weight:800;color:var(--blue-deep);margin-right:4px}
+.bubble .warn{display:inline-block;margin-top:6px;font-size:12px;color:var(--coral-deep);background:var(--coral-weak);border-radius:8px;padding:4px 8px}
+.bubble .src-link{color:var(--blue-deep);text-decoration:underline;cursor:pointer}
+
+.typing{display:flex;gap:4px;padding:6px 2px}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--gray-4);animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+.input-bar{flex-shrink:0;background:var(--white);border-top:1px solid var(--gray-2);padding:14px 20px 18px}
+.input-inner{max-width:720px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;background:var(--gray-05);border:1px solid var(--gray-2);border-radius:16px;padding:8px 8px 8px 16px;transition:.12s}
+.input-inner:focus-within{border-color:var(--blue);background:var(--white)}
+#qInput{flex:1;border:none;background:transparent;resize:none;font-family:var(--font);font-size:14px;line-height:1.5;max-height:120px;padding:8px 0;color:var(--ink)}
+#qInput:focus{outline:none}
+#sendBtn{width:38px;height:38px;border-radius:12px;background:var(--blue);color:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.12s;cursor:pointer}
+#sendBtn:hover{background:var(--blue-deep)}
+#sendBtn:disabled{background:var(--gray-3);cursor:default}
+.hint{max-width:720px;margin:8px auto 0;padding:0 4px;font-size:11.5px;color:var(--gray-5)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="icon" onclick="resetChat()" title="새 대화 시작">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+  </div>
+  <div>
+    <div class="title">회계·세무 Wiki Q&A</div>
+    <div class="sub">위키에 있는 내용만 근거로 답변합니다</div>
+  </div>
+</header>
+
+<div class="chat-area" id="chatArea">
+  <div class="chat-inner" id="chatInner">
+    <div class="empty" id="emptyState">
+      <div class="icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 0 1-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+      </div>
+      <div class="t1">궁금한 회계·세무 내용을 물어보세요</div>
+      <div class="t2">위키 문서에 있는 내용만으로 답변하며,<br>없는 내용은 없다고 알려드립니다.</div>
+      <div class="suggest-list">
+        <button class="suggest-item" onclick="askSuggested(this)">고객이 코인을 결제할 때 어떤 계정으로 잡아?</button>
+        <button class="suggest-item" onclick="askSuggested(this)">비사업자가 사업자가 되었을 때 어떻게 처리해야 해?</button>
+        <button class="suggest-item" onclick="askSuggested(this)">거래처 등록은 어떻게 해?</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="input-bar">
+  <div class="input-inner">
+    <textarea id="qInput" rows="1" placeholder="질문을 입력하세요"></textarea>
+    <button id="sendBtn" onclick="sendQuestion()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+    </button>
+  </div>
+  <div class="hint">답변은 위키 문서 발췌를 바탕으로 생성되며, 확정 전 정보는 회계팀에 다시 확인하세요.</div>
+</div>
+
+<script>
+var qInput = document.getElementById('qInput');
+var sendBtn = document.getElementById('sendBtn');
+var chatInner = document.getElementById('chatInner');
+var chatArea = document.getElementById('chatArea');
+var emptyState = document.getElementById('emptyState');
+var isSending = false;
+
+qInput.addEventListener('input', function(){
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+qInput.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendQuestion();
+  }
+});
+
+function askSuggested(btn){
+  qInput.value = btn.textContent;
+  sendQuestion();
+}
+
+function resetChat(){
+  chatInner.querySelectorAll('.msg').forEach(function(row){ row.remove(); });
+  if (emptyState) emptyState.style.display = '';
+  qInput.value = '';
+  qInput.style.height = 'auto';
+  isSending = false;
+  sendBtn.disabled = false;
+  chatArea.scrollTop = 0;
+}
+
+function scrollToBottom(){
+  chatArea.scrollTop = chatArea.scrollHeight;
+}
+
+function addUserMessage(text){
+  if (emptyState) { emptyState.style.display = 'none'; }
+  var row = document.createElement('div');
+  row.className = 'msg qa-user';
+  var bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text;
+  row.appendChild(bubble);
+  chatInner.appendChild(row);
+  scrollToBottom();
+}
+
+function addBotTyping(){
+  var row = document.createElement('div');
+  row.className = 'msg qa-bot';
+  row.id = 'typingRow';
+  row.innerHTML =
+    '<div class="avatar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>' +
+    '<div class="bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  chatInner.appendChild(row);
+  scrollToBottom();
+}
+
+function formatAnswer(text, sources){
+  var esc = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  esc = esc.replace(/^(결론|근거|출처)\s*:/gm, '<span class="ans-label">$1</span>:');
+  esc = esc.replace(/\(※확정 전 정보이니[^)]*\)/g, '<span class="warn">$&</span>');
+
+  // "출처:" 줄에 언급된 문서 제목을, 실제 위키 문서로 바로 이동하는 링크로 바꾼다.
+  if (sources && sources.length){
+    sources.forEach(function(s){
+      if (!s.key) return;
+      var esc_title = s.title.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      var re = new RegExp(esc_title, 'g');
+      esc = esc.replace(re, '<a href="#" class="src-link" data-key="' + s.key.replace(/"/g,'&quot;') + '">' + s.title + '</a>');
+    });
+  }
+
+  var lines = esc.split('\n').filter(function(l){ return l.length > 0; });
+  return lines.map(function(l){ return '<div class="ans-line">' + l + '</div>'; }).join('');
+}
+
+function addBotMessage(text, sources){
+  var row = document.getElementById('typingRow');
+  if (!row) {
+    row = document.createElement('div');
+    row.className = 'msg qa-bot';
+    row.innerHTML = '<div class="avatar"></div><div class="bubble"></div>';
+    chatInner.appendChild(row);
+  }
+  row.removeAttribute('id');
+  var bubble = row.querySelector('.bubble');
+  var isNotFound = text.indexOf('위키에 없는 내용입니다') === 0 || text.indexOf('위키에서 찾지 못했습니다') === 0;
+  if (isNotFound) bubble.className = 'bubble notfound';
+  bubble.innerHTML = formatAnswer(text, sources);
+  bubble.querySelectorAll('.src-link').forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      var key = a.getAttribute('data-key');
+      if (typeof openDoc === 'function' && typeof toggleQaPanel === 'function'){
+        openDoc(key);
+        toggleQaPanel();
+      }
+    });
+  });
+  scrollToBottom();
+}
+
+function sendQuestion(){
+  if (isSending) return;
+  var q = qInput.value.trim();
+  if (!q) return;
+
+  isSending = true;
+  sendBtn.disabled = true;
+  addUserMessage(q);
+  qInput.value = '';
+  qInput.style.height = 'auto';
+  addBotTyping();
+
+  google.script.run
+    .withSuccessHandler(function(result){
+      var answer = (result && typeof result === 'object') ? result.answer : result;
+      var sources = (result && typeof result === 'object') ? result.sources : null;
+      addBotMessage(answer, sources);
+      isSending = false;
+      sendBtn.disabled = false;
+      qInput.focus();
+    })
+    .withFailureHandler(function(err){
+      addBotMessage('오류가 발생했습니다: ' + (err && err.message ? err.message : err));
+      isSending = false;
+      sendBtn.disabled = false;
+    })
+    .askWiki(q);
+}
+</script>
+</body>
+</html>

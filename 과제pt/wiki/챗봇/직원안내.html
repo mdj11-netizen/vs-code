@@ -1,0 +1,278 @@
+<style>
+.staffdir-search-wrap{position:relative;margin-bottom:8px}
+.staffdir-search-wrap .ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--gray-4)}
+.staffdir-search-wrap input{width:100%;box-sizing:border-box;padding:12px 16px 12px 38px;border:1px solid var(--gray-2);border-radius:10px;font-size:14px;outline:none;background:var(--gray-05);font-family:inherit;color:var(--ink)}
+.staffdir-search-wrap input:focus{border-color:var(--blue);background:var(--white)}
+.staffdir-search-wrap input:disabled{color:var(--gray-4)}
+.staffdir-hint{font-size:12px;color:var(--gray-5);margin:0 2px 18px}
+.staffdir-grid{display:flex;flex-direction:column;gap:14px}
+.staffdir-list{display:flex;flex-direction:column;gap:12px}
+.staffdir-empty{font-size:13px;color:var(--gray-5);padding:36px 0;text-align:center}
+.staffdir-card{background:var(--white);border:1px solid var(--gray-2);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.staffdir-person-name{font-size:15px;font-weight:800;color:var(--ink)}
+.staffdir-person-title{font-size:12px;color:var(--gray-5);font-weight:600;margin-left:6px}
+.staffdir-section{margin-top:14px}
+.staffdir-section-label{font-size:11.5px;font-weight:700;color:var(--gray-5);margin-bottom:6px}
+.staffdir-tasklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.staffdir-tasklist li{font-size:13px;color:var(--ink);padding-left:12px;position:relative}
+.staffdir-tasklist li::before{content:'';position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--gray-3)}
+.staffdir-chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.staffdir-breadcrumb{font-size:14px;font-weight:700;color:var(--gray-6);margin-bottom:8px}
+.staffdir-breadcrumb .last{color:var(--blue-deep);font-weight:800}
+.staffdir-managers{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:6px;font-size:12.5px;color:var(--gray-6)}
+.staffdir-managers strong{color:var(--ink);font-weight:700}
+.staffdir-note{font-size:12.5px;color:var(--gray-6);margin-bottom:8px;line-height:1.5}
+</style>
+
+<div class="staffdir">
+  <div class="staffdir-search-wrap">
+    <span class="ic">🔍</span>
+    <input type="text" id="staffSearchInput" placeholder="팀 이름·담당자 이름·업무 키워드로 검색 (예: 콘텐츠기획팀, 김민정, 법인카드)" oninput="staffOnSearchInput()" disabled>
+  </div>
+  <p class="staffdir-hint" id="staffSearchHint">검색어를 지우면 담당자별 요약 화면으로 돌아갑니다.</p>
+
+  <div id="staffDefaultView">
+    <div class="staffdir-grid" id="staffPeopleGrid">
+      <div class="staffdir-empty">담당자 정보를 불러오는 중...</div>
+    </div>
+  </div>
+
+  <div id="staffResultsView" style="display:none">
+    <div class="staffdir-list" id="staffResultList"></div>
+  </div>
+</div>
+
+<script>
+var staffOrgData = { rows: [], people: [], tasks: [] };
+
+function staffOnDataLoaded(data){
+  staffOrgData = data || { rows: [], people: [], tasks: [] };
+  staffOrgData.rows = staffOrgData.rows || [];
+  staffOrgData.people = staffOrgData.people || [];
+  staffOrgData.tasks = staffOrgData.tasks || [];
+
+  staffOrgData.rows.forEach(function(r){
+    r._searchText = [r.label, r.cardManager, r.kidari, r.lezhin, r.note].join(' ').toLowerCase();
+  });
+  staffOrgData.tasks.forEach(function(t){
+    var names = [];
+    Object.keys(t.assignees || {}).forEach(function(entityKey){ names = names.concat(t.assignees[entityKey]); });
+    t._searchText = [t.category, t.task].concat(names).join(' ').toLowerCase();
+  });
+
+  var input = document.getElementById('staffSearchInput');
+  if (input) input.disabled = false;
+
+  if (staffOrgData.workError) {
+    var hint = document.getElementById('staffSearchHint');
+    if (hint) {
+      hint.textContent = '업무분장표를 불러오지 못해 "담당 업무"는 비어 있습니다: ' + staffOrgData.workError;
+      hint.style.color = 'var(--coral-deep)';
+    }
+  }
+
+  staffRenderPeople();
+}
+
+function staffAppendSection(body, label, contentEl){
+  var section = document.createElement('div');
+  section.className = 'staffdir-section';
+  var labelEl = document.createElement('div');
+  labelEl.className = 'staffdir-section-label';
+  labelEl.textContent = label;
+  section.appendChild(labelEl);
+  section.appendChild(contentEl);
+  body.appendChild(section);
+}
+
+function staffBuildChipRow(teams){
+  var row = document.createElement('div');
+  row.className = 'staffdir-chip-row';
+  teams.forEach(function(team){
+    var chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.textContent = team;
+    row.appendChild(chip);
+  });
+  return row;
+}
+
+function staffBuildTaskList(tasks){
+  var ul = document.createElement('ul');
+  ul.className = 'staffdir-tasklist';
+  tasks.forEach(function(t){
+    var li = document.createElement('li');
+    li.appendChild(document.createTextNode(t.task));
+    t.entities.forEach(function(entity){
+      var tag = document.createElement('span');
+      tag.className = 'chip';
+      tag.style.marginLeft = '6px';
+      tag.textContent = entity;
+      li.appendChild(tag);
+    });
+    ul.appendChild(li);
+  });
+  return ul;
+}
+
+function staffRenderPeople(){
+  var grid = document.getElementById('staffPeopleGrid');
+  grid.innerHTML = '';
+
+  if (!staffOrgData.people.length){
+    grid.innerHTML = '<div class="staffdir-empty">등록된 담당자 정보가 없습니다.</div>';
+    return;
+  }
+
+  staffOrgData.people.forEach(function(p){
+    try {
+      var card = document.createElement('div');
+      card.className = 'staffdir-card';
+
+      var name = document.createElement('div');
+      name.innerHTML = '<span class="staffdir-person-name">' + staffEscapeHtml(p.name) + '</span>' +
+        (p.title ? '<span class="staffdir-person-title">' + staffEscapeHtml(p.title) + '</span>' : '');
+      card.appendChild(name);
+
+      (p.taskGroups || []).forEach(function(group){
+        staffAppendSection(card, group.category, staffBuildTaskList(group.tasks || []));
+      });
+
+      var cardTeams = p.cardTeams || [];
+      if (cardTeams.length) staffAppendSection(card, '법인카드', staffBuildChipRow(cardTeams));
+
+      var voucherTeams = (p.kidariTeams || []).concat(p.lezhinTeams || []).filter(function(team, idx, arr){
+        return arr.indexOf(team) === idx;
+      });
+      if (voucherTeams.length) staffAppendSection(card, '전표/결의서', staffBuildChipRow(voucherTeams));
+
+      grid.appendChild(card);
+    } catch(e){
+      console.error('담당자 카드 렌더링 실패: ' + (p && p.name), e);
+    }
+  });
+}
+
+function staffOnSearchInput(){
+  var query = document.getElementById('staffSearchInput').value.trim();
+  var defaultView = document.getElementById('staffDefaultView');
+  var resultsView = document.getElementById('staffResultsView');
+
+  if (!query){
+    defaultView.style.display = '';
+    resultsView.style.display = 'none';
+    return;
+  }
+  defaultView.style.display = 'none';
+  resultsView.style.display = '';
+  staffRenderResults(query);
+}
+
+function staffRenderResults(query){
+  var q = query.toLowerCase();
+  var taskMatches = staffOrgData.tasks.filter(function(t){ return t._searchText.indexOf(q) !== -1; });
+  var rowMatches = staffOrgData.rows.filter(function(r){ return r._searchText.indexOf(q) !== -1; });
+
+  var list = document.getElementById('staffResultList');
+  list.innerHTML = '';
+
+  if (!taskMatches.length && !rowMatches.length){
+    list.innerHTML = '<div class="staffdir-empty">일치하는 결과가 없습니다.</div>';
+    return;
+  }
+
+  taskMatches.forEach(function(t){
+    var card = document.createElement('div');
+    card.className = 'staffdir-card';
+
+    var title = document.createElement('p');
+    title.className = 'staffdir-breadcrumb';
+    title.textContent = t.category + ' > ' + t.task;
+    card.appendChild(title);
+
+    var managers = document.createElement('div');
+    managers.className = 'staffdir-managers';
+    Object.keys(t.assignees).forEach(function(entityKey){
+      var tag = document.createElement('span');
+      tag.innerHTML = staffEscapeHtml(entityKey) + ' · <strong>' + staffEscapeHtml(t.assignees[entityKey].join(', ')) + '</strong>';
+      managers.appendChild(tag);
+    });
+    card.appendChild(managers);
+    list.appendChild(card);
+  });
+
+  rowMatches.forEach(function(r){
+    var card = document.createElement('div');
+    card.className = 'staffdir-card';
+
+    var title = document.createElement('p');
+    title.className = 'staffdir-breadcrumb';
+    staffAppendBreadcrumb(title, r.breadcrumb);
+    card.appendChild(title);
+
+    var managers = document.createElement('div');
+    managers.className = 'staffdir-managers';
+
+    var kidariTag = document.createElement('span');
+    kidariTag.innerHTML = '키다리 담당자 · <strong>' + staffEscapeHtml(r.kidari || '-') + '</strong>';
+    managers.appendChild(kidariTag);
+
+    var lezhinTag = document.createElement('span');
+    lezhinTag.innerHTML = '레진 담당자 · <strong>' + staffEscapeHtml(r.lezhin || '-') + '</strong>';
+    managers.appendChild(lezhinTag);
+
+    if (r.cardManager){
+      var cardTag = document.createElement('span');
+      cardTag.innerHTML = '법인카드 · <strong>' + staffEscapeHtml(r.cardManager) + '</strong>';
+      managers.appendChild(cardTag);
+    }
+    card.appendChild(managers);
+
+    if (r.note){
+      var note = document.createElement('p');
+      note.className = 'staffdir-note';
+      note.textContent = r.note;
+      card.appendChild(note);
+    }
+
+    if (r.guideLink){
+      var link = document.createElement('a');
+      link.className = 'jump-link';
+      link.href = r.guideLink;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '주요 안내문 열기 →';
+      card.appendChild(link);
+    }
+
+    list.appendChild(card);
+  });
+}
+
+function staffAppendBreadcrumb(container, breadcrumb){
+  var parts = (breadcrumb || '').split(' > ');
+  parts.forEach(function(part, idx){
+    if (idx > 0) container.appendChild(document.createTextNode(' > '));
+    if (idx === parts.length - 1){
+      var last = document.createElement('span');
+      last.className = 'last';
+      last.textContent = part;
+      container.appendChild(last);
+    } else {
+      container.appendChild(document.createTextNode(part));
+    }
+  });
+}
+
+function staffEscapeHtml(str){
+  return (str || '').toString().replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+google.script.run
+  .withSuccessHandler(staffOnDataLoaded)
+  .withFailureHandler(function(err){
+    document.getElementById('staffPeopleGrid').innerHTML =
+      '<div class="staffdir-empty">데이터를 불러오지 못했습니다: ' + (err && err.message ? err.message : err) + '</div>';
+  })
+  .getStaffDirectoryData();
+</script>
